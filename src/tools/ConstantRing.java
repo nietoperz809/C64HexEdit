@@ -40,16 +40,10 @@ public class ConstantRing
         if (n<0)
         {
             n = -n - 1;
-            if (n == 0)
-                return constants.get(constants.size() - 1);
-            return constants.get(n-1);
         }
-        else
-        {
-            n--;
-        }
+        n--;
         if (n < 0)
-            return constants.get(constants.size()-1);
+            return constants.get(constants.size() - 1);
         return constants.get(n);
     }
 
@@ -63,11 +57,11 @@ public class ConstantRing
 //        System.out.println(ring.next(31)); // 9
 //        System.out.println(ring.next(32)); // 9
 
-//        System.out.println(ring.prev(1));  // 31
-//        System.out.println(ring.prev(9));  // 31
-//        System.out.println(ring.prev(10)); // 9
-//        System.out.println(ring.prev(11)); // 10
-//        System.out.println(ring.prev(31)); // 30
-//        System.out.println(ring.prev(32)); // 31
+        System.out.println(ring.prev(1));  // 31
+        System.out.println(ring.prev(9));  // 31
+        System.out.println(ring.prev(10)); // 9
+        System.out.println(ring.prev(11)); // 10
+        System.out.println(ring.prev(31)); // 30
+        System.out.println(ring.prev(32)); // 31
     }
 }
