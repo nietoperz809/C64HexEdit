@@ -17,6 +17,8 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     public static final int CHARS_PER_LINE = 41;
     private static final int NO_CHARACTER = ' ';
     static final int SCALE=16;
+    public ConstantRing valid_xpos =
+            new ConstantRing(new int[]{9,10,12,13,15,16,18,19,21,22,24,25,27,28,30,31});
 
     private FileMapper mapper;
 
@@ -29,6 +31,10 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     public void setMapper (FileMapper f)
     {
         mapper = f;
+    }
+    public FileMapper getMapper ()
+    {
+        return mapper;
     }
 
     public C64VideoMatrix ()
@@ -46,13 +52,13 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         {
             add(createEmptyLine());
         }
-        currentCursorPos.x = 0;
+        currentCursorPos.x = valid_xpos.getFirst();
         currentCursorPos.y = 0;
     }
 
     synchronized public void setCursorPos (int x, int y)
     {
-        currentCursorPos.x = x;
+        currentCursorPos.x = valid_xpos.nearest(x);
         currentCursorPos.y = y;
     }
 
@@ -111,7 +117,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
             line[currentCursorPos.x].face = c;
             line[currentCursorPos.x].colorIndex = defaultColorIndex;
             if (currentCursorPos.x < (CHARS_PER_LINE-1))
-                currentCursorPos.x++;
+                currentCursorPos.x = valid_xpos.next(currentCursorPos.x);
         }
     }
 
@@ -175,10 +181,9 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     synchronized public void left()
     {
         if (currentCursorPos.x > 0)
-            currentCursorPos.x--;
+            currentCursorPos.x = valid_xpos.prev(currentCursorPos.x);
     }
 
-    ConstantRing ring = new ConstantRing(new int[]{9,10,12,13,15,16,18,19,21,22,24,25,27,28,30,31});
 
     /**
      * Move cursor right
@@ -186,7 +191,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     synchronized public void right()
     {
         if (currentCursorPos.x < CHARS_PER_LINE-1)
-            currentCursorPos.x++;
+            currentCursorPos.x = valid_xpos.next(currentCursorPos.x);
     }
 
     /**

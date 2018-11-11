@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,7 +17,7 @@ public class C64Panel extends JPanel
 {
     private final static int SCALE=16;
     private final C64VideoMatrix matrix = new C64VideoMatrix();
-    private final RingBuffer<Character> ringBuff = new RingBuffer<>(40);
+    //private final RingBuffer<Character> ringBuff = new RingBuffer<>(40);
 
     public C64VideoMatrix getMatrix()
     {
@@ -53,7 +52,26 @@ public class C64Panel extends JPanel
                 if (c == VK_ENTER)
                 {
                     char[] arr = matrix.readLine();
-                    System.out.println(Arrays.toString(arr));
+                    long address = Long.parseLong(String.valueOf(arr, 0, 8), 16);
+                    byte[] bt = new byte[8];
+                    int start = 0;
+                    for (int s=0; s<8; s++)
+                    {
+                        String s1 = "";
+                        start = matrix.valid_xpos.next(start);
+                        s1 = s1+arr[start];
+                        start = matrix.valid_xpos.next(start);
+                        s1 = s1+arr[start];
+                        bt[s] = (byte)Integer.parseInt(s1, 16);
+                    }
+                    try
+                    {
+                        matrix.getMapper().setBytes(address, bt);
+                    }
+                    catch (Exception e1)
+                    {
+                        e1.printStackTrace();
+                    }
                 }
                 else if (c != VK_BACKSPACE)
                 {

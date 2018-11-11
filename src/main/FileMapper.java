@@ -7,6 +7,7 @@ import c64terminal.CharacterWriter;
 
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
 import static java.lang.String.format;
@@ -14,9 +15,12 @@ import static java.lang.String.format;
 public class FileMapper
 {
     private FileChannel fileChannel;
+    private MappedByteBuffer byteBuffer;
     private int offset = 0;
-
     private C64VideoMatrix matrix;
+
+    final int len = C64VideoMatrix.LINES_ON_SCREEN*8;
+    final byte[] bytes = new byte[len];
 
     public FileMapper (File f,C64VideoMatrix matrix) throws Exception
     {
@@ -53,11 +57,21 @@ public class FileMapper
         }
     }
 
-    public void displayLines () throws Exception
+    public void setBytes (long address, byte[] data) throws Exception
     {
-        final int len = C64VideoMatrix.LINES_ON_SCREEN*8;
-        byte[] bytes = new byte[len];
-        fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len).get(bytes);
+        //System.out.println(Arrays.toString(bytes));
+        System.arraycopy(data,0, bytes,(int)address-offset,data.length);
+        //System.out.println(Arrays.toString(bytes));
+        byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
+        byteBuffer.put (bytes);
+
+        displayLines();
+    }
+
+    public void displayLines() throws Exception
+    {
+        byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
+        byteBuffer.get (bytes);
         int start = 0;
         for (int s = 0; s<C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
