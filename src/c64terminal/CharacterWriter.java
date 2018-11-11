@@ -1,4 +1,4 @@
-package terminal;/*
+package c64terminal;/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -86,12 +86,6 @@ public class CharacterWriter implements CharacterROM
         return instance;
     }
 
-
-    public static void main (String[] args)
-    {
-        System.out.println(CharacterROM.characterData.length / 8);
-    }
-
     void setBackgroundColor (int idx)
     {
         backgroundColor = C64Colors.values()[idx].getRGB();
@@ -115,10 +109,27 @@ public class CharacterWriter implements CharacterROM
         return out;
     }
 
+    public char[] mapCBMtoPC (C64Character[] in)
+    {
+        char[] out = new char[in.length];
+        for (int s = 0; s < in.length; s++)
+        {
+            Character c1 = reverseKeyMap.get((char)in[s].face);
+            out[s] = c1 == null ? (char)in[s].face : c1;
+        }
+        return out;
+    }
+
     public char mapPCtoCBM (char in)
     {
         Character c1 = keyMap.get(in);
         return c1 == null ? in : c1;
+    }
+
+    public void writeChar (C64Character c, char face, C64Colors col)
+    {
+        c.colorIndex = col.ordinal();
+        c.face = mapPCtoCBM(face);
     }
 
 }

@@ -1,6 +1,7 @@
-package terminal;
+package c64terminal;
 
 import main.FileMapper;
+import tools.ConstantRing;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,9 +13,9 @@ import static java.awt.event.KeyEvent.VK_ENTER;
  */
 public class C64VideoMatrix extends ArrayList<C64Character[]>
 {
-    static final int LINES_ON_SCREEN = 25;
-    static final int CHARS_PER_LINE = 41;
-    private static final int NO_CHARACTER = 0x100 + ' ';
+    public static final int LINES_ON_SCREEN = 25;
+    public static final int CHARS_PER_LINE = 41;
+    private static final int NO_CHARACTER = ' ';
     static final int SCALE=16;
 
     private FileMapper mapper;
@@ -129,25 +130,11 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
      *
      * @return a char array
      */
-    synchronized public Character[] readLine ()
+    synchronized public char[] readLine ()
     {
         ArrayList<Character> arr = new ArrayList<>();
-        int ypos = currentCursorPos.y;
-        for(;;)
-        {
-            C64Character c64[] = get(ypos);
-            for (C64Character aC64 : c64)
-            {
-                if (aC64.face == NO_CHARACTER)
-                {
-                    Character[] ret = new Character[arr.size()];
-                    arr.toArray(ret);
-                    return ret; 
-                }
-                arr.add((char) aC64.face);
-            }
-            ypos++;
-        }
+        C64Character c64[] = get(currentCursorPos.y);
+        return CharacterWriter.getInstance().mapCBMtoPC(c64);
     }
 
     /**
@@ -190,6 +177,8 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         if (currentCursorPos.x > 0)
             currentCursorPos.x--;
     }
+
+    ConstantRing ring = new ConstantRing(new int[]{9,10,12,13,15,16,18,19,21,22,24,25,27,28,30,31});
 
     /**
      * Move cursor right

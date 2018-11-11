@@ -1,4 +1,4 @@
-package terminal;
+package c64terminal;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +17,6 @@ import static java.awt.event.KeyEvent.VK_ENTER;
 public class C64Panel extends JPanel
 {
     private final static int SCALE=16;
-    //CharacterWriter.getInstance();
     private final C64VideoMatrix matrix = new C64VideoMatrix();
     private final RingBuffer<Character> ringBuff = new RingBuffer<>(40);
 
@@ -52,26 +52,26 @@ public class C64Panel extends JPanel
                 char c = e.getKeyChar();
                 if (c == VK_ENTER)
                 {
-                    Character[] arr = matrix.readLine();
-                    if (arr == null)
-                        return;
+                    char[] arr = matrix.readLine();
+                    System.out.println(Arrays.toString(arr));
                 }
-                else if (c == VK_BACKSPACE)
+                else if (c != VK_BACKSPACE)
                 {
-                    return;
-                }
-                ringBuff.add(c);
-                matrix.putChar(CharacterWriter.getInstance().mapPCtoCBM(c),
+                    matrix.putChar(CharacterWriter.getInstance().mapPCtoCBM(c),
                         e.getKeyCode(), e.isActionKey());
+                }
+//                ringBuff.add(c);
+//                matrix.putChar(CharacterWriter.getInstance().mapPCtoCBM(c),
+//                        e.getKeyCode(), e.isActionKey());
             }
 
             void handleSpecialKeys (KeyEvent e)
             {
                 switch (e.getKeyCode())
                 {
-                    case KeyEvent.VK_BACK_SPACE:
-                        matrix.backspace();
-                        break;
+//                    case KeyEvent.VK_BACK_SPACE:
+//                        matrix.backspace();
+//                        break;
 
                     case KeyEvent.VK_LEFT:
                         matrix.left();

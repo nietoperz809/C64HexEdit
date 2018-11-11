@@ -1,4 +1,4 @@
-package terminal;
+package c64terminal;
 
 
 public final class RingBuffer<T>

@@ -1,6 +1,6 @@
 package main;
 
-import terminal.C64VideoMatrix;
+import c64terminal.C64VideoMatrix;
 
 import javax.swing.*;
 import java.awt.*;

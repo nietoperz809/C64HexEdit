@@ -1,4 +1,4 @@
-package terminal;
+package c64terminal;
 
 /**
  * Created by Administrator on 1/19/2017.

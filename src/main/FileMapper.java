@@ -1,13 +1,15 @@
 package main;
 
-import terminal.C64Character;
-import terminal.C64VideoMatrix;
-import terminal.CharacterWriter;
+import c64terminal.C64Character;
+import c64terminal.C64Colors;
+import c64terminal.C64VideoMatrix;
+import c64terminal.CharacterWriter;
 
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+
+import static java.lang.String.format;
 
 public class FileMapper
 {
@@ -53,40 +55,26 @@ public class FileMapper
 
     public void displayLines () throws Exception
     {
-        final int len = 25*8;
-        int start = 0;
+        final int len = C64VideoMatrix.LINES_ON_SCREEN*8;
         byte[] bytes = new byte[len];
-        char[] chars = new char[len];
-        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
-        buffer.get(bytes);
-        for (int s = 0; s<chars.length; s++)
-        {
-            char c =(char)bytes[s];
-            if (Character.isLetterOrDigit(c))
-                chars[s] = c;
-            else
-                chars[s] = '.';
-        }
-        for (int s = 0; s<25; s++)
+        fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len).get(bytes);
+        int start = 0;
+        for (int s = 0; s<C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
             StringBuilder sb = new StringBuilder();
             C64Character[] c64 = matrix.get(s);
-            sb.append(String.format("%08x", start+offset)).append(' ');
+            String addr = format("%08x", start+offset);
             for (int t=0; t<8; t++)
             {
-                sb.append (String.format("%02x", bytes[t+start])).append(' ');
-            }
-            for (int t=0; t<8; t++)
-            {
-                sb.append (String.format("%c", chars[t+start]));
+                CharacterWriter.getInstance().writeChar(c64[t],addr.charAt(t), C64Colors.YELLOW);
+                int idx = 3*t+9;
+                String temp = String.format("%02x", bytes[t+start]);
+                CharacterWriter.getInstance().writeChar(c64[idx],temp.charAt(0), C64Colors.WHITE);
+                CharacterWriter.getInstance().writeChar(c64[idx+1],temp.charAt(1),C64Colors.WHITE);
+                idx = 33+t;
+                CharacterWriter.getInstance().writeChar(c64[idx],(char)bytes[t+start], C64Colors.PURPLE);
             }
             start += 8;
-            char[] cc = sb.toString().toCharArray();
-            for (int t=0; t<c64.length; t++)
-            {
-                c64[t].face = CharacterWriter.getInstance().mapPCtoCBM(cc[t]);
-                c64[t].colorIndex = 3;
-            }
         }
     }
 }

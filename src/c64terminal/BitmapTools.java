@@ -1,4 +1,4 @@
-package terminal;
+package c64terminal;
 
 import java.awt.*;
 import java.awt.image.*;

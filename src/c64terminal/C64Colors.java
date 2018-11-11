@@ -1,4 +1,4 @@
-package terminal;
+package c64terminal;
 
 import java.awt.*;
 
@@ -15,7 +15,7 @@ import java.awt.*;
  * left-hand corner of the screen to red, type: POKE 55296,2.
  */
 
-enum C64Colors
+public enum C64Colors
 {
     BLACK(new Color(0)),
     WHITE(new Color(0xffffff)),

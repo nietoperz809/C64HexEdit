@@ -1,6 +1,6 @@
 package main;
 
-import terminal.C64Panel;
+import c64terminal.C64Panel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,6 +23,7 @@ public class MainFrame
     {
         mainPanel = new JPanel();
         c64Panel1 = new C64Panel();
+        c64Panel1.setBorder(BorderFactory.createRaisedBevelBorder());
     }
 
     {
