@@ -59,12 +59,11 @@ public class FileMapper
 
     public void setBytes (long address, byte[] data) throws Exception
     {
-        //System.out.println(Arrays.toString(bytes));
         System.arraycopy(data,0, bytes,(int)address-offset,data.length);
-        //System.out.println(Arrays.toString(bytes));
-        byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
+        //byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
+        byteBuffer.position(0);
         byteBuffer.put (bytes);
-
+        byteBuffer.force();
         displayLines();
     }
 
