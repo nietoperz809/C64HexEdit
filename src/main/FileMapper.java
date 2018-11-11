@@ -16,11 +16,11 @@ public class FileMapper
 {
     private FileChannel fileChannel;
     private MappedByteBuffer byteBuffer;
-    private int offset = 0;
-    private C64VideoMatrix matrix;
+    private long  offset = 0;
+    private final C64VideoMatrix matrix;
 
-    final int len = C64VideoMatrix.LINES_ON_SCREEN*8;
-    final byte[] bytes = new byte[len];
+    private final int len = C64VideoMatrix.LINES_ON_SCREEN*8;
+    private final byte[] bytes = new byte[len];
 
     public FileMapper (File f,C64VideoMatrix matrix) throws Exception
     {
@@ -59,7 +59,7 @@ public class FileMapper
 
     public void setBytes (long address, byte[] data) throws Exception
     {
-        System.arraycopy(data,0, bytes,(int)address-offset,data.length);
+        System.arraycopy(data,0, bytes,(int)(address-offset),data.length);
         //byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
         byteBuffer.position(0);
         byteBuffer.put (bytes);
@@ -74,7 +74,6 @@ public class FileMapper
         int start = 0;
         for (int s = 0; s<C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
-            StringBuilder sb = new StringBuilder();
             C64Character[] c64 = matrix.get(s);
             String addr = format("%08x", start+offset);
             for (int t=0; t<8; t++)
@@ -88,6 +87,19 @@ public class FileMapper
                 CharacterWriter.getInstance().writeChar(c64[idx],(char)bytes[t+start], C64Colors.PURPLE);
             }
             start += 8;
+        }
+    }
+
+    public void setScrollbarOffset (long value)
+    {
+        offset = value;
+        try
+        {
+            displayLines();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

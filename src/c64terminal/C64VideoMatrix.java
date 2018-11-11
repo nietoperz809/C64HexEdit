@@ -76,25 +76,25 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         return c;
     }
 
-    /**
-     * Move cursor to the line below
-     * Shifts lines up and creates a new one at the end
-     * if cursor moves behind last line.
-     */
-    private synchronized void nextLine ()
-    {
-//        currentCursorPos.x = 0;
-//        currentCursorPos.y++;
-//        if (currentCursorPos.y == LINES_ON_SCREEN)
-//        {
-//            currentCursorPos.y--;
-//            for (int s = 0; s< LINES_ON_SCREEN -1; s++)
-//            {
-//                set (s, get(s+1));
-//            }
-//            set (LINES_ON_SCREEN -1, createEmptyLine());
-//        }
-    }
+//    /**
+//     * Move cursor to the line below
+//     * Shifts lines up and creates a new one at the end
+//     * if cursor moves behind last line.
+//     */
+//    private synchronized void nextLine ()
+//    {
+////        currentCursorPos.x = 0;
+////        currentCursorPos.y++;
+////        if (currentCursorPos.y == LINES_ON_SCREEN)
+////        {
+////            currentCursorPos.y--;
+////            for (int s = 0; s< LINES_ON_SCREEN -1; s++)
+////            {
+////                set (s, get(s+1));
+////            }
+////            set (LINES_ON_SCREEN -1, createEmptyLine());
+////        }
+//    }
 
     /**
      * Injects new Char
@@ -121,14 +121,14 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         }
     }
 
-    /**
-     * Get current cursor position
-     * @return the cursorPos (cloned)
-     */
-    synchronized public Point getCursor()
-    {
-        return (Point) currentCursorPos.clone();
-    }
+//    /**
+//     * Get current cursor position
+//     * @return the cursorPos (cloned)
+//     */
+//    synchronized public Point getCursor()
+//    {
+//        return (Point) currentCursorPos.clone();
+//    }
 
     /**
      * Gets input line as char array only
@@ -194,31 +194,31 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
             currentCursorPos.x = valid_xpos.next(currentCursorPos.x);
     }
 
-    /**
-     * Insert a backspace
-     */
-    synchronized public void backspace()
-    {
-        left();
-        putChar(' ', 0, false);
-        left();
-    }
+//    /**
+//     * Insert a backspace
+//     */
+//    synchronized public void backspace()
+//    {
+//        left();
+//        putChar(' ', 0, false);
+//        left();
+//    }
 
-    /**
-     * Inserts entire string
-     * @param str
-     */
-    synchronized void putString (String str)
-    {
-        str = str.toLowerCase();
-        for (int s=0; s<str.length(); s++)
-        {
-            char c = str.charAt(s);
-            int keycode = c == '\n' ? VK_ENTER : 0;
-            c = CharacterWriter.getInstance().mapPCtoCBM(c);
-            putChar(c, keycode, false);
-        }
-    }
+//    /**
+//     * Inserts entire string
+//     * @param str
+//     */
+//    synchronized void putString (String str)
+//    {
+//        str = str.toLowerCase();
+//        for (int s=0; s<str.length(); s++)
+//        {
+//            char c = str.charAt(s);
+//            int keycode = c == '\n' ? VK_ENTER : 0;
+//            c = CharacterWriter.getInstance().mapPCtoCBM(c);
+//            putChar(c, keycode, false);
+//        }
+//    }
 
 
     /**
@@ -234,39 +234,39 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         return p;
     }
 
-    /**
-     * Get value at specified address
-     * @param offset screen memory address
-     * @return the value
-     */
-    synchronized public int peekFace (int offset) throws Exception
-    {
-        Point p = elementfromAddress(offset);
-        return get(p.y)[p.x].face;
-    }
+//    /**
+//     * Get value at specified address
+//     * @param offset screen memory address
+//     * @return the value
+//     */
+//    synchronized public int peekFace (int offset) throws Exception
+//    {
+//        Point p = elementfromAddress(offset);
+//        return get(p.y)[p.x].face;
+//    }
 
-    synchronized public int peekColor (int offset) throws Exception
-    {
-        Point p = elementfromAddress(offset);
-        return get(p.y)[p.x].colorIndex;
-    }
-
-    /**
-     * Set value at specified address
-     * @param offset screen memory address
-     * @param val the new value
-     */
-    synchronized public void pokeFace (int offset, int val) throws Exception
-    {
-        Point p = elementfromAddress(offset);
-        get(p.y)[p.x].face = val;
-    }
-
-    synchronized public void pokeColor (int offset, int val) throws Exception
-    {
-        Point p = elementfromAddress(offset);
-        get(p.y)[p.x].colorIndex = val;
-    }
+//    synchronized public int peekColor (int offset) throws Exception
+//    {
+//        Point p = elementfromAddress(offset);
+//        return get(p.y)[p.x].colorIndex;
+//    }
+//
+//    /**
+//     * Set value at specified address
+//     * @param offset screen memory address
+//     * @param val the new value
+//     */
+//    synchronized public void pokeFace (int offset, int val) throws Exception
+//    {
+//        Point p = elementfromAddress(offset);
+//        get(p.y)[p.x].face = val;
+//    }
+//
+//    synchronized public void pokeColor (int offset, int val) throws Exception
+//    {
+//        Point p = elementfromAddress(offset);
+//        get(p.y)[p.x].colorIndex = val;
+//    }
 
     private boolean blinkflag = false;
     public void render (Graphics g)

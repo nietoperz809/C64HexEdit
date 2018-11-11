@@ -6,7 +6,7 @@ import java.awt.image.*;
 /**
  * Created by Administrator on 1/25/2017.
  */
-public class BitmapTools
+class BitmapTools
 {
     //Just copy-paste this method
     public static Image makeColorTransparent (BufferedImage im, final Color color)
@@ -14,7 +14,7 @@ public class BitmapTools
         ImageFilter filter = new RGBImageFilter()
         {
             // the color we are looking for... Alpha bits are set to opaque
-            public final int markerRGB = color.getRGB() | 0xFF000000;
+            final int markerRGB = color.getRGB() | 0xFF000000;
 
             public final int filterRGB (int x, int y, int rgb)
             {
@@ -35,19 +35,21 @@ public class BitmapTools
         return Toolkit.getDefaultToolkit().createImage(ip);
     }
 
-    /**
-     * Convert Image to BufferedImage.
-     *
-     * @param image Image to be converted to BufferedImage.
-     * @return BufferedImage corresponding to provided Image.
-     */
-    public static BufferedImage imageToBufferedImage(final Image image, int type)
-    {
-        final BufferedImage bufferedImage =
-                new BufferedImage(image.getWidth(null), image.getHeight(null), type);
-        final Graphics2D g2 = bufferedImage.createGraphics();
-        g2.drawImage(image, 0, 0, null);
-        g2.dispose();
-        return bufferedImage;
-    }
+// --Commented out by Inspection START (11/11/2018 8:53 PM):
+//    /**
+//     * Convert Image to BufferedImage.
+//     *
+//     * @param image Image to be converted to BufferedImage.
+//     * @return BufferedImage corresponding to provided Image.
+//     */
+//    public static BufferedImage imageToBufferedImage(final Image image, int type)
+//    {
+//        final BufferedImage bufferedImage =
+//                new BufferedImage(image.getWidth(null), image.getHeight(null), type);
+//        final Graphics2D g2 = bufferedImage.createGraphics();
+//        g2.drawImage(image, 0, 0, null);
+//        g2.dispose();
+//        return bufferedImage;
+//    }
+// --Commented out by Inspection STOP (11/11/2018 8:53 PM)
 }

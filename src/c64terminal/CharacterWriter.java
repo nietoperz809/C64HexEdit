@@ -86,11 +86,15 @@ public class CharacterWriter implements CharacterROM
         return instance;
     }
 
-    void setBackgroundColor (int idx)
-    {
-        backgroundColor = C64Colors.values()[idx].getRGB();
-        fillImageMap();
-    }
+// --Commented out by Inspection START (11/11/2018 8:53 PM):
+//    void setBackgroundColor (int idx)
+//    {
+// --Commented out by Inspection START (11/11/2018 8:53 PM):
+////        backgroundColor = C64Colors.values()[idx].getRGB();
+////        fillImageMap();
+////    }
+//// --Commented out by Inspection STOP (11/11/2018 8:53 PM)
+// --Commented out by Inspection STOP (11/11/2018 8:53 PM)
 
     void switchCharset()
     {
@@ -98,16 +102,18 @@ public class CharacterWriter implements CharacterROM
         fillImageMap();
     }
 
-    public char[] mapCBMtoPC (Character[] in)
-    {
-        char[] out = new char[in.length];
-        for (int s = 0; s < in.length; s++)
-        {
-            Character c1 = reverseKeyMap.get(in[s]);
-            out[s] = c1 == null ? in[s] : c1;
-        }
-        return out;
-    }
+// --Commented out by Inspection START (11/11/2018 8:53 PM):
+//    public char[] mapCBMtoPC (Character[] in)
+//    {
+//        char[] out = new char[in.length];
+//        for (int s = 0; s < in.length; s++)
+//        {
+//            Character c1 = reverseKeyMap.get(in[s]);
+//            out[s] = c1 == null ? in[s] : c1;
+//        }
+//        return out;
+//    }
+// --Commented out by Inspection STOP (11/11/2018 8:53 PM)
 
     public char[] mapCBMtoPC (C64Character[] in)
     {

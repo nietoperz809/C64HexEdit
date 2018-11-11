@@ -14,8 +14,12 @@ public class ActionPanel
     private JButton openButton;
     private JLabel fileName;
     private FileMapper mapper;
-
     private C64VideoMatrix matrix;
+
+    public FileMapper getMapper()
+    {
+        return mapper;
+    }
 
     public ActionPanel (final C64VideoMatrix mat)
     {
