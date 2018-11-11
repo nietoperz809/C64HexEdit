@@ -39,6 +39,8 @@ public class C64Panel extends JPanel
             @Override
             public void mouseClicked (MouseEvent e)
             {
+                matrix.setCursorPos(e.getX()/C64VideoMatrix.SCALE,
+                        e.getY()/C64VideoMatrix.SCALE);
                 requestFocusInWindow();
             }
         });

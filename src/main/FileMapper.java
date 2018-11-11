@@ -12,7 +12,7 @@ import java.nio.channels.FileChannel;
 public class FileMapper
 {
     private FileChannel fileChannel;
-    private int index = 0;
+    private int offset = 0;
 
     private C64VideoMatrix matrix;
 
@@ -24,7 +24,7 @@ public class FileMapper
 
     public void scrollUp()
     {
-        index += 8;
+        offset += 8;
         try
         {
             displayLines();
@@ -37,9 +37,9 @@ public class FileMapper
 
     public void scrollDown()
     {
-        if (index != 0)
+        if (offset != 0)
         {
-            index -= 8;
+            offset -= 8;
             try
             {
                 displayLines();
@@ -53,10 +53,11 @@ public class FileMapper
 
     public void displayLines () throws Exception
     {
-        int start = index;
-        byte[] bytes = new byte[25*8];
-        char[] chars = new char[25*8];
-        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, index, 25 * 8);
+        final int len = 25*8;
+        int start = 0;
+        byte[] bytes = new byte[len];
+        char[] chars = new char[len];
+        MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, len);
         buffer.get(bytes);
         for (int s = 0; s<chars.length; s++)
         {
@@ -70,14 +71,14 @@ public class FileMapper
         {
             StringBuilder sb = new StringBuilder();
             C64Character[] c64 = matrix.get(s);
-            sb.append(String.format("%08x", start)).append(' ');
+            sb.append(String.format("%08x", start+offset)).append(' ');
             for (int t=0; t<8; t++)
             {
-                sb.append (String.format("%02x", bytes[t+start-index])).append(' ');
+                sb.append (String.format("%02x", bytes[t+start])).append(' ');
             }
             for (int t=0; t<8; t++)
             {
-                sb.append (String.format("%c", chars[t+start-index]));
+                sb.append (String.format("%c", chars[t+start]));
             }
             start += 8;
             char[] cc = sb.toString().toCharArray();

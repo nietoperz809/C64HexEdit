@@ -15,6 +15,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     static final int LINES_ON_SCREEN = 25;
     static final int CHARS_PER_LINE = 41;
     private static final int NO_CHARACTER = 0x100 + ' ';
+    static final int SCALE=16;
 
     private FileMapper mapper;
 
@@ -46,6 +47,12 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         }
         currentCursorPos.x = 0;
         currentCursorPos.y = 0;
+    }
+
+    synchronized public void setCursorPos (int x, int y)
+    {
+        currentCursorPos.x = x;
+        currentCursorPos.y = y;
     }
 
     /**
@@ -267,7 +274,6 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
         get(p.y)[p.x].colorIndex = val;
     }
 
-    private final static int SCALE=16;
     private boolean blinkflag = false;
     public void render (Graphics g)
     {
