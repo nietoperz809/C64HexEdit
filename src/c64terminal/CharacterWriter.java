@@ -19,7 +19,7 @@ public class CharacterWriter implements CharacterROM
     final HashMap<Character, Image> imageMap = new HashMap<>();
     private final HashMap<Character, Character> keyMap = new HashMap<>();
     private final HashMap<Character, Character> reverseKeyMap = new HashMap<>();
-    private int backgroundColor = C64Colors.BLUE.getRGB();
+    private int backgroundColor = C64Color.BLUE.getRGB();
     private boolean shifted = true;
     /**
      * Constructor, fills the char imageMap
@@ -90,7 +90,7 @@ public class CharacterWriter implements CharacterROM
 //    void setBackgroundColor (int idx)
 //    {
 // --Commented out by Inspection START (11/11/2018 8:53 PM):
-////        backgroundColor = C64Colors.values()[idx].getRGB();
+////        backgroundColor = C64Color.values()[idx].getRGB();
 ////        fillImageMap();
 ////    }
 //// --Commented out by Inspection STOP (11/11/2018 8:53 PM)
@@ -132,7 +132,7 @@ public class CharacterWriter implements CharacterROM
         return c1 == null ? in : c1;
     }
 
-    public void writeChar (C64Character c, char face, C64Colors col)
+    public void writeChar (C64Character c, char face, C64Color col)
     {
         c.colorIndex = col.ordinal();
         c.face = mapPCtoCBM(face);

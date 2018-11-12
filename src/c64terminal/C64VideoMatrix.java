@@ -280,7 +280,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
             {
                 C64Character c64c = get(y)[x];
                 int face = c64c.face & 0x00ff;
-                g.setColor (C64Colors.values()[c64c.colorIndex].getColor());
+                g.setColor (C64Color.values()[c64c.colorIndex].getColor());
                 g.fillRect(xpos, ypos, SCALE, SCALE);
                 g.drawImage(writer.imageMap.get((char)face),
                         xpos, ypos, SCALE, SCALE, null);

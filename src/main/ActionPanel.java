@@ -41,7 +41,8 @@ public class ActionPanel
             if (result == JFileChooser.APPROVE_OPTION)
             {
                 File selectedFile = fileChooser.getSelectedFile();
-                fileName.setText(selectedFile.getAbsolutePath());
+                fileName.setText(selectedFile.getAbsolutePath() + " : "+
+                        String.format("%x", selectedFile.length()));
                 try
                 {
                     mapper = new FileMapper (selectedFile, matrix);

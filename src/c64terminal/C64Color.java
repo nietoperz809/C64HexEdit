@@ -15,7 +15,7 @@ import java.awt.*;
  * left-hand corner of the screen to red, type: POKE 55296,2.
  */
 
-public enum C64Colors
+public enum C64Color
 {
     BLACK(new Color(0)),
     WHITE(new Color(0xffffff)),
@@ -36,7 +36,7 @@ public enum C64Colors
 
     private final Color c;
 
-    C64Colors (Color val)
+    C64Color (Color val)
     {
         c = val;
     }
