@@ -6,6 +6,7 @@ import c64terminal.C64VideoMatrix;
 import c64terminal.CharacterWriter;
 import sun.nio.ch.DirectBuffer;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.RandomAccessFile;
 import java.nio.MappedByteBuffer;
@@ -15,23 +16,24 @@ import static java.lang.String.format;
 
 public class FileMapper
 {
-    private static FileChannel fileChannel;
     private static RandomAccessFile raFile;
     private final C64VideoMatrix matrix;
     private final int mappedLength = C64VideoMatrix.LINES_ON_SCREEN * 8;
     private final byte[] mappedBytes = new byte[mappedLength];
-    private MappedByteBuffer byteBuffer;
-    private long offset = 0;
+    //private long offset = 0;
     private long filesize = 0;
     private File inputFile;
+    private JScrollBar scroller;
 
-    public FileMapper (File f, C64VideoMatrix matrix) throws Exception
+    public FileMapper (File f, C64VideoMatrix matrix, JScrollBar scroller) throws Exception
     {
-        close();
+        if (raFile != null)
+            raFile.close();
         this.matrix = matrix;
         this.inputFile = f;
+        this.scroller = scroller;
         filesize = f.length();
-        open();
+        raFile = new RandomAccessFile(inputFile, "rws");
     }
 
     public static void unmap (MappedByteBuffer buffer)
@@ -41,54 +43,24 @@ public class FileMapper
     }
 
     /**
-     * Close file and channel
-     * @throws Exception if something went wrong
-     */
-    public void close () throws Exception
-    {
-        if (fileChannel != null)
-        {
-            fileChannel.close();
-        }
-        if (raFile != null)
-        {
-            raFile.close();
-        }
-        //unmap (byteBuffer);
-    }
-
-    /**
-     * Open file and channel
-     * @throws Exception if something went wrong
-     */
-    public void open () throws Exception
-    {
-        raFile = new RandomAccessFile(inputFile, "rws");
-        fileChannel = raFile.getChannel();
-    }
-
-    /**
-     * Write bytes into file by using a separate FileChannel
+     * Write bytes into file
      * @param dat bytes to write
      * @param offs position of file where writing begins
      * @throws Exception if something went wrong
      */
     public void putBytes (byte[] dat, long offs) throws Exception
     {
-        RandomAccessFile ra = new RandomAccessFile(inputFile, "rws");
-        FileChannel chan = ra.getChannel();
+        FileChannel chan = raFile.getChannel();
         MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, dat.length);
         buff.put(dat);
         buff.force();
-        chan.close();
-        ra.close();
-        //unmap (buff);
-        offset = offs;
+        //offset = offs;
+        unmap (buff);
         displayMap();
     }
 
     /**
-     * Read bytes from file by using a separate FileChannel
+     * Read bytes from file
      * @param offs Position where to begin reading
      * @param len number of bytes to read
      * @return byte Array containing requested file content
@@ -96,14 +68,11 @@ public class FileMapper
      */
     public byte[] getBytes (long offs, int len) throws Exception
     {
-        RandomAccessFile ra = new RandomAccessFile(inputFile, "rws");
-        FileChannel chan = ra.getChannel();
+        FileChannel chan = raFile.getChannel();
         MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, len);
         byte[] ret = new byte[len];
         buff.get(ret);
-        chan.close();
-        ra.close();
-        //unmap (buff);
+        unmap (buff);
         return ret;
     }
 
@@ -114,12 +83,14 @@ public class FileMapper
      */
     public void displayMap () throws Exception
     {
-        byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, mappedLength);
+        FileChannel chan = raFile.getChannel();
+        MappedByteBuffer byteBuffer = chan.map(FileChannel.MapMode.READ_WRITE,
+                scroller.getValue(), mappedLength);
         byteBuffer.get(mappedBytes);
         for (int s = 0; s < C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
             C64Character[] c64 = matrix.get(s);
-            String addr = format("%08x", s * 8 + offset);
+            String addr = format("%08x", s * 8 + scroller.getValue());
             CharacterWriter cw = CharacterWriter.getInstance();
             for (int t = 0; t < 8; t++)
             {
@@ -134,6 +105,7 @@ public class FileMapper
                 cw.writeChar(c64[idx], (char) mappedBytes[src_idx], C64Color.ORANGE);
             }
         }
+        unmap (byteBuffer);
     }
 
     /**
@@ -145,7 +117,7 @@ public class FileMapper
      */
     private boolean isPosFileEnd (int t, int s) throws Exception
     {
-        long pos = offset + s * 8 + t;
+        long pos = scroller.getValue() + s * 8 + t;
         return pos == filesize;
     }
 
@@ -154,7 +126,8 @@ public class FileMapper
      */
     public void scrollUp ()
     {
-        offset += 8;
+        scroller.setValue(scroller.getValue()+8);
+        //offset += 8;
         try
         {
             displayMap();
@@ -170,9 +143,10 @@ public class FileMapper
      */
     public void scrollDown ()
     {
-        offset -= 8;
-        if (offset < 0)
-            offset = 0;
+        scroller.setValue(scroller.getValue()-8);
+//        offset -= 8;
+//        if (offset < 0)
+//            offset = 0;
         try
         {
             displayMap();
@@ -183,22 +157,13 @@ public class FileMapper
         }
     }
 
-//    public void setBytes (long address, byte[] data) throws Exception
-//    {
-//        System.arraycopy(data, 0, mappedBytes, (int) (address - offset), data.length);
-//        byteBuffer.position(0);
-//        byteBuffer.put(mappedBytes);
-//        byteBuffer.force();
-//        displayMap();
-//    }
-
     /**
      * Scrollbar is moved
      * @param value Scrollbar value
      */
     public void setScrollbarOffset (long value)
     {
-        offset = value;
+        //offset = value;
         try
         {
             displayMap();
@@ -206,6 +171,23 @@ public class FileMapper
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public void setFileSize (long size)
+    {
+        FileChannel chan = raFile.getChannel();
+        {
+            try
+            {
+                chan.truncate(size);
+                filesize = size;
+                displayMap();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 }

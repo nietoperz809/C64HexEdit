@@ -58,7 +58,7 @@ public class MainFrame
         mainPanel.setLayout(new BorderLayout(0, 0));
         mainPanel.add(c64Panel1, BorderLayout.CENTER);
 
-        scroller = new JScrollBar(JScrollBar.VERTICAL, 0, 25*8, 0, 0x7ffffff0);
+        scroller = new JScrollBar(JScrollBar.VERTICAL, 0, 0x1000, 0, 0x7ffffff0);
         scroller.addAdjustmentListener(e ->
         {
             nestedForm1.getMapper().setScrollbarOffset (e.getValue());

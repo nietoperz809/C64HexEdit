@@ -55,7 +55,7 @@ public class ActionPanel
                         String.format("%x", selectedFile.length()));
                 try
                 {
-                    mapper = new FileMapper (selectedFile, matrix);
+                    mapper = new FileMapper (selectedFile, matrix, scroller);
                     matrix.setMapper(mapper);
                     mapper.displayMap();
                     changeButton.setEnabled(true);

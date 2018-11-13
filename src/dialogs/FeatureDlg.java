@@ -6,39 +6,165 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.security.SecureRandom;
 
 import static tools.Misc.readInputBox;
 
+
+class MyRadio extends JRadioButton
+{
+    private static int counter;
+
+    static void setCounter (int num)
+    {
+        counter = num;
+    }
+
+    MyRadio (String txt)
+    {
+        super(txt);
+        setActionCommand("" + counter);
+        counter++;
+    }
+}
+
 public class FeatureDlg extends JDialog
 {
-	private final JPanel contentPanel = new JPanel();
-	private JTextField fromField;
-	private JTextField sizeField;
-	private JTextField patternField;
-	private final ButtonGroup buttonGroup = new ButtonGroup();
+    private final JPanel contentPanel = new JPanel();
+    private final ButtonGroup buttonGroup = new ButtonGroup();
+    private final JTextField textField_3;
+    private JTextField fromField;
+    private JTextField sizeField;
+    private JTextField patternField;
     private byte[] data;
     private FileMapper mapper;
 
-    private void allocDataField()
+    /**
+     * Create the dialog.
+     */
+    public FeatureDlg (FileMapper mapper)
     {
-        int n = 0;
-        try
-        {
-            data = new byte[(int)readInputBox(sizeField)];
-        }
-        catch (Exception e)
-        {
-            data = new byte[256];
-        }
-    }
+        this.mapper = mapper;
+        MyRadio.setCounter(1);
+        setTitle("Fill with");
+        setBounds(100, 100, 346, 465);
+        getContentPane().setLayout(new BorderLayout());
+        contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+        getContentPane().add(contentPanel, BorderLayout.CENTER);
+        contentPanel.setLayout(null);
 
-    static public class DlgRes
-    {
-        public byte[] data;
-        public long startPos;
+        fromField = new JTextField("0");
+        fromField.setBounds(170, 28, 116, 22);
+        contentPanel.add(fromField);
+        fromField.setColumns(10);
+
+        sizeField = new JTextField("8");
+        sizeField.setBounds(170, 63, 116, 22);
+        contentPanel.add(sizeField);
+        sizeField.setColumns(10);
+
+        JLabel lblFrom = new JLabel("Address");
+        lblFrom.setBounds(120, 31, 50, 16);
+        contentPanel.add(lblFrom);
+
+        JLabel lblSize = new JLabel("Size");
+        lblSize.setBounds(140, 66, 24, 16);
+        contentPanel.add(lblSize);
+
+        JRadioButton rdbtnCountUp = new MyRadio("Count up");
+        buttonGroup.add(rdbtnCountUp);
+        rdbtnCountUp.setBounds(26, 28, 91, 25);
+        contentPanel.add(rdbtnCountUp);
+
+        JRadioButton rdbtnCountDown = new MyRadio("Count down");
+        buttonGroup.add(rdbtnCountDown);
+        rdbtnCountDown.setBounds(26, 58, 116, 25);
+        contentPanel.add(rdbtnCountDown);
+
+        JRadioButton rdbtnZeros = new MyRadio("Zeros");
+        buttonGroup.add(rdbtnZeros);
+        rdbtnZeros.setBounds(26, 88, 91, 25);
+        contentPanel.add(rdbtnZeros);
+
+        JRadioButton rdbtnFfs = new MyRadio("FF's");
+        buttonGroup.add(rdbtnFfs);
+        rdbtnFfs.setBounds(26, 118, 127, 25);
+        contentPanel.add(rdbtnFfs);
+
+        JRadioButton rdbtnaa = new MyRadio("55AA");
+        buttonGroup.add(rdbtnaa);
+        rdbtnaa.setBounds(26, 148, 101, 25);
+        contentPanel.add(rdbtnaa);
+
+        JRadioButton rdbtnAa = new MyRadio("AA55");
+        buttonGroup.add(rdbtnAa);
+        rdbtnAa.setBounds(26, 178, 127, 25);
+        contentPanel.add(rdbtnAa);
+
+        JRadioButton rdbtnRandom = new MyRadio("Random");
+        buttonGroup.add(rdbtnRandom);
+        rdbtnRandom.setBounds(26, 208, 82, 25);
+        contentPanel.add(rdbtnRandom);
+
+        JRadioButton rdbtnText = new MyRadio("Text");
+        buttonGroup.add(rdbtnText);
+        rdbtnText.setBounds(26, 238, 67, 25);
+        contentPanel.add(rdbtnText);
+
+        JRadioButton rdbtnPattern = new MyRadio("Hex Pattern");
+        buttonGroup.add(rdbtnPattern);
+        rdbtnPattern.setBounds(26, 268, 91, 25);
+        contentPanel.add(rdbtnPattern);
+
+        JRadioButton rdbtnXorWpattern = new MyRadio("Xor FF");
+        buttonGroup.add(rdbtnXorWpattern);
+        rdbtnXorWpattern.setBounds(26, 302, 127, 25);
+        contentPanel.add(rdbtnXorWpattern);
+
+        JLabel lblTextOrPattern = new JLabel("Text or Pattern");
+        lblTextOrPattern.setBounds(170, 125, 101, 16);
+        contentPanel.add(lblTextOrPattern);
+
+        patternField = new JTextField();
+        patternField.setBounds(137, 147, 149, 22);
+        contentPanel.add(patternField);
+        patternField.setColumns(10);
+
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        getContentPane().add(buttonPane, BorderLayout.SOUTH);
+
+        textField_3 = new JTextField();
+        textField_3.setBounds(155, 239, 116, 22);
+        contentPanel.add(textField_3);
+        textField_3.setColumns(10);
+
+        JButton btnNewButton = new JButton("New Size");
+        btnNewButton.addActionListener(e ->
+        {
+            mapper.setFileSize(readInputBox(textField_3));
+            this.dispose();
+        });
+        btnNewButton.setBounds(165, 268, 97, 25);
+        contentPanel.add(btnNewButton);
+
+        JButton okButton = new JButton("OK");
+        buttonPane.add(okButton);
+        okButton.addActionListener(e ->
+        {
+            handleRadioButton();
+            this.dispose();
+        });
+
+        getRootPane().setDefaultButton(okButton);
+
+        JButton cancelButton = new JButton("Cancel");
+        buttonPane.add(cancelButton);
+        cancelButton.addActionListener(e ->
+        {
+            data = null;
+            this.dispose();
+        });
     }
 
     public static DlgRes startDlg (FileMapper mapper)
@@ -60,232 +186,111 @@ public class FeatureDlg extends JDialog
         return res;
     }
 
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		try {
-//			FeatureDlg dialog = new FeatureDlg();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-	/**
-	 * Create the dialog.
-	 */
-	public FeatureDlg (FileMapper mapper)
+    private void handleRadioButton ()
     {
-		this.mapper = mapper;
-        setTitle("Fill with");
-        setBounds(100, 100, 346, 465);
-		getContentPane().setLayout(new BorderLayout());
-		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(null);
+        ButtonModel mod = buttonGroup.getSelection();
+        if (mod == null)
+            return;
+        allocDataField();
+        String act = mod.getActionCommand();
+        switch (act)
+        {
+            case "1":
+                for (int s = 0; s < data.length; s++)
+                {
+                    data[s] = (byte) s;
+                }
+                break;
 
-		fromField = new JTextField();
-		fromField.setBounds(170, 28, 116, 22);
-		contentPanel.add(fromField);
-		fromField.setColumns(10);
+            case "2":
+                for (int s = 0; s < data.length; s++)
+                {
+                    data[s] = (byte) (255-s);
+                }
+                break;
 
-		sizeField = new JTextField();
-		sizeField.setBounds(170, 63, 116, 22);
-		contentPanel.add(sizeField);
-		sizeField.setColumns(10);
-
-		JLabel lblFrom = new JLabel("From");
-		lblFrom.setBounds(137, 31, 43, 16);
-		contentPanel.add(lblFrom);
-
-		JLabel lblSize = new JLabel("Size");
-		lblSize.setBounds(140, 66, 24, 16);
-		contentPanel.add(lblSize);
-
-		JRadioButton rdbtnCountUp = new JRadioButton("Count up");
-		rdbtnCountUp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0)
-			{
-			    allocDataField();
-			    for (int s=0; s<data.length; s++)
-			        data[s] = (byte)s;
-			}
-		});
-		buttonGroup.add(rdbtnCountUp);
-		rdbtnCountUp.setBounds(26, 28, 91, 25);
-		contentPanel.add(rdbtnCountUp);
-
-		JRadioButton rdbtnCountDown = new JRadioButton("Count down");
-		rdbtnCountDown.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
-                for (int s=0; s<data.length; s++)
-                    data[s] = (byte)(s-256);
-            }
-		});
-		buttonGroup.add(rdbtnCountDown);
-		rdbtnCountDown.setBounds(26, 58, 116, 25);
-		contentPanel.add(rdbtnCountDown);
-
-		JRadioButton rdbtnZeros = new JRadioButton("Zeros");
-		rdbtnZeros.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
-                for (int s=0; s<data.length; s++)
+            case "3":
+                for (int s = 0; s < data.length; s++)
+                {
                     data[s] = 0;
-            }
-		});
-		buttonGroup.add(rdbtnZeros);
-		rdbtnZeros.setBounds(26, 88, 91, 25);
-		contentPanel.add(rdbtnZeros);
-
-		JRadioButton rdbtnFfs = new JRadioButton("FF's");
-		rdbtnFfs.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
-                for (int s=0; s<data.length; s++)
-                    data[s] = (byte)0xff;
-            }
-		});
-		buttonGroup.add(rdbtnFfs);
-		rdbtnFfs.setBounds(26, 118, 127, 25);
-		contentPanel.add(rdbtnFfs);
-
-		JRadioButton rdbtnaa = new JRadioButton("55AA");
-		rdbtnaa.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
-                for (int s=0; s<data.length; s++)
-                {
-                    data[s] = (byte) (s%2 == 0 ? 0x55 : 0xaa);
                 }
-            }
-		});
-		buttonGroup.add(rdbtnaa);
-		rdbtnaa.setBounds(26, 148, 101, 25);
-		contentPanel.add(rdbtnaa);
+                break;
 
-		JRadioButton rdbtnAa = new JRadioButton("AA55");
-		rdbtnAa.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
-                for (int s=0; s<data.length; s++)
+            case "4":
+                for (int s = 0; s < data.length; s++)
                 {
-                    data[s] = (byte) (s%2 == 1 ? 0x55 : 0xaa);
+                    data[s] = (byte) 0xff;
                 }
-            }
-		});
-		buttonGroup.add(rdbtnAa);
-		rdbtnAa.setBounds(26, 178, 127, 25);
-		contentPanel.add(rdbtnAa);
+                break;
 
-		JRadioButton rdbtnRandom = new JRadioButton("Random");
-		rdbtnRandom.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                allocDataField();
+            case "5":
+                for (int s = 0; s < data.length; s++)
+                {
+                    data[s] = (byte) (s % 2 == 0 ? 0x55 : 0xaa);
+                }
+                break;
+
+            case "6":
+                for (int s = 0; s < data.length; s++)
+                {
+                    data[s] = (byte) (s % 2 == 1 ? 0x55 : 0xaa);
+                }
+                break;
+
+            case "7":
                 SecureRandom random = new SecureRandom();
                 random.nextBytes(data);
-            }
-		});
-		buttonGroup.add(rdbtnRandom);
-		rdbtnRandom.setBounds(26, 208, 82, 25);
-		contentPanel.add(rdbtnRandom);
+                break;
 
-		JRadioButton rdbtnText = new JRadioButton("Text");
-		rdbtnText.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-            {
-                allocDataField();
+            case "8":
                 byte[] pat = patternField.getText().getBytes();
-                for (int s=0; s<data.length; s++)
+                for (int s = 0; s < data.length; s++)
                 {
-                    data[s] = pat[s%pat.length];
+                    data[s] = pat[s % pat.length];
                 }
-			}
-		});
-		buttonGroup.add(rdbtnText);
-		rdbtnText.setBounds(26, 238, 67, 25);
-		contentPanel.add(rdbtnText);
+                break;
 
-		patternField = new JTextField();
-		patternField.setBounds(137, 147, 149, 22);
-		contentPanel.add(patternField);
-		patternField.setColumns(10);
-
-		JRadioButton rdbtnPattern = new JRadioButton("Hex Pattern");
-		rdbtnPattern.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e)
-            {
-                allocDataField();
+            case "9":
                 byte[] hex = DatatypeConverter.parseHexBinary(patternField.getText());
-                for (int s=0; s<data.length; s++)
+                for (int s = 0; s < data.length; s++)
                 {
-                    data[s] = hex[s%hex.length];
+                    data[s] = hex[s % hex.length];
                 }
-            }
-		});
-		buttonGroup.add(rdbtnPattern);
-		rdbtnPattern.setBounds(26, 268, 91, 25);
-		contentPanel.add(rdbtnPattern);
+                break;
 
-        JRadioButton rdbtnXorWpattern = new JRadioButton("Xor FF");
-        rdbtnXorWpattern.addActionListener(arg0 ->
+            case "10":
+                try
+                {
+                    long from = readInputBox(fromField);
+                    byte[] orig = mapper.getBytes(from, data.length);
+                    for (int s = 0; s < data.length; s++)
+                    {
+                        data[s] = (byte) (orig[s] ^ 0xff);
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                break;
+        }
+    }
+
+    private void allocDataField ()
+    {
+        try
         {
-            allocDataField();
-            try
-            {
-                long from = readInputBox(fromField);
-                byte[] orig = mapper.getBytes(from,data.length);
-                byte[] hex = DatatypeConverter.parseHexBinary(patternField.getText());
-                for (int s=0; s<data.length; s++)
-                {
-                    data[s] = (byte) (orig[s]^0xff);
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        });
-        buttonGroup.add(rdbtnXorWpattern);
-        rdbtnXorWpattern.setBounds(26, 298, 91, 25);
-        contentPanel.add(rdbtnXorWpattern);
+            data = new byte[(int) readInputBox(sizeField)];
+        }
+        catch (Exception e)
+        {
+            data = new byte[1];
+        }
+    }
 
-		JLabel lblTextOrPattern = new JLabel("Text or Pattern");
-		lblTextOrPattern.setBounds(170, 118, 101, 16);
-		contentPanel.add(lblTextOrPattern);
-
-        rdbtnXorWpattern.setBounds(26, 302, 127, 25);
-		{
-			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
-			{
-				JButton okButton = new JButton("OK");
-				buttonPane.add(okButton);
-				okButton.addActionListener(e ->
-                {
-                    this.dispose();
-                });
-				getRootPane().setDefaultButton(okButton);
-			}
-			{
-				JButton cancelButton = new JButton("Cancel");
-				buttonPane.add(cancelButton);
-                cancelButton.addActionListener(e ->
-                {
-                    data = null;
-                    this.dispose();
-                });
-			}
-		}
-	}
+    static public class DlgRes
+    {
+        public byte[] data;
+        public long startPos;
+    }
 }
