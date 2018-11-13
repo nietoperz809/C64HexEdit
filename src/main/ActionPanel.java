@@ -57,7 +57,7 @@ public class ActionPanel
                 {
                     mapper = new FileMapper (selectedFile, matrix);
                     matrix.setMapper(mapper);
-                    mapper.displayLines();
+                    mapper.displayMap();
                     changeButton.setEnabled(true);
                     addressInput.setEnabled(true);
                 }
@@ -76,7 +76,8 @@ public class ActionPanel
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new FlowLayout());
         thisPanel.add(panel2, BorderLayout.WEST);
-        openButton = new JButton("Open");
+        openButton = new JButton("File");
+        openButton.setToolTipText("Click to open existing or create a new file");
         panel2.add(openButton);
         addressInput = new JTextField("0x10000000");
         addressInput.setToolTipText("New position+ENTER");
@@ -100,8 +101,6 @@ public class ActionPanel
         });
         panel2.add (changeButton);
         fileName = new JLabel();
-        fileName.setBackground(new Color(-16777216));
-        fileName.setForeground(new Color(-16729088));
         fileName.setHorizontalAlignment(0);
         fileName.setOpaque(true);
         fileName.setText("Label");

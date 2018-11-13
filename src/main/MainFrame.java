@@ -4,8 +4,8 @@ import c64terminal.C64Panel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 public class MainFrame
 {
@@ -17,7 +17,22 @@ public class MainFrame
     public static void main (String[] args)
     {
         JFrame frame = new JFrame("C64 Hexer");
-        frame.setContentPane(new MainFrame().mainPanel);
+        MainFrame mf = new MainFrame();
+        frame.addWindowFocusListener(new WindowFocusListener()
+        {
+            @Override
+            public void windowGainedFocus (WindowEvent e)
+            {
+                mf.c64Panel1.requestFocus();
+            }
+
+            @Override
+            public void windowLostFocus (WindowEvent e)
+            {
+                //mf.c64Panel1.requestFocus();
+            }
+        });
+        frame.setContentPane(mf.mainPanel);
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
@@ -44,14 +59,9 @@ public class MainFrame
         mainPanel.add(c64Panel1, BorderLayout.CENTER);
 
         scroller = new JScrollBar(JScrollBar.VERTICAL, 0, 25*8, 0, 0x7ffffff0);
-        scroller.addAdjustmentListener(new AdjustmentListener()
+        scroller.addAdjustmentListener(e ->
         {
-            @Override
-            public void adjustmentValueChanged (AdjustmentEvent e)
-            {
-                nestedForm1.getMapper().setScrollbarOffset (e.getValue());
-                //System.out.println(e.getValue());
-            }
+            nestedForm1.getMapper().setScrollbarOffset (e.getValue());
         });
 
         mainPanel.add(scroller, BorderLayout.EAST);

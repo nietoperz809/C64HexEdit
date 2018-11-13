@@ -28,7 +28,6 @@ public class C64Panel extends JPanel
     {
         setDoubleBuffered(true);
         setFocusable(true);
-        requestFocusInWindow();
         setPreferredSize(new Dimension(
                 C64VideoMatrix.CHARS_PER_LINE*SCALE,
                 C64VideoMatrix.LINES_ON_SCREEN*SCALE));
@@ -38,9 +37,9 @@ public class C64Panel extends JPanel
             @Override
             public void mouseClicked (MouseEvent e)
             {
+                requestFocusInWindow();
                 matrix.setCursorPos(e.getX()/C64VideoMatrix.SCALE,
                         e.getY()/C64VideoMatrix.SCALE);
-                requestFocusInWindow();
             }
         });
 
@@ -66,7 +65,7 @@ public class C64Panel extends JPanel
                     }
                     try
                     {
-                        matrix.getMapper().setBytes(address, bt);
+                        matrix.getMapper().putBytes(bt, address); //setBytes(address, bt);
                     }
                     catch (Exception e1)
                     {
