@@ -18,9 +18,7 @@ public class FileMapper
 {
     private static RandomAccessFile raFile;
     private final C64VideoMatrix matrix;
-    private final int mappedLength = C64VideoMatrix.LINES_ON_SCREEN * 8;
-    private final byte[] mappedBytes = new byte[mappedLength];
-    //private long offset = 0;
+    private final byte[] mappedBytes = new byte[C64VideoMatrix.LINES_ON_SCREEN * 8];
     private long filesize = 0;
     private File inputFile;
     private JScrollBar scroller;
@@ -62,18 +60,15 @@ public class FileMapper
     /**
      * Read bytes from file
      * @param offs Position where to begin reading
-     * @param len number of bytes to read
-     * @return byte Array containing requested file content
+     * @param dest buffer to receive the bytes
      * @throws Exception if something went wrong
      */
-    public byte[] getBytes (long offs, int len) throws Exception
+    public void getBytes (long offs, byte[] dest) throws Exception
     {
         FileChannel chan = raFile.getChannel();
-        MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, len);
-        byte[] ret = new byte[len];
-        buff.get(ret);
+        MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_ONLY, offs, dest.length);
+        buff.get(dest);
         unmap (buff);
-        return ret;
     }
 
 
@@ -83,10 +78,7 @@ public class FileMapper
      */
     public void displayMap () throws Exception
     {
-        FileChannel chan = raFile.getChannel();
-        MappedByteBuffer byteBuffer = chan.map(FileChannel.MapMode.READ_WRITE,
-                scroller.getValue(), mappedLength);
-        byteBuffer.get(mappedBytes);
+        getBytes(scroller.getValue(), mappedBytes);
         for (int s = 0; s < C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
             C64Character[] c64 = matrix.get(s);
@@ -105,7 +97,6 @@ public class FileMapper
                 cw.writeChar(c64[idx], (char) mappedBytes[src_idx], C64Color.ORANGE);
             }
         }
-        unmap (byteBuffer);
     }
 
     /**

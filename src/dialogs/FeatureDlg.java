@@ -262,7 +262,8 @@ public class FeatureDlg extends JDialog
                 try
                 {
                     long from = readInputBox(fromField);
-                    byte[] orig = mapper.getBytes(from, data.length);
+                    byte[] orig = new byte [data.length];
+                    mapper.getBytes(from, orig);
                     for (int s = 0; s < data.length; s++)
                     {
                         data[s] = (byte) (orig[s] ^ 0xff);
