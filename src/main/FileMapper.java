@@ -62,6 +62,18 @@ public class FileMapper
         displayLines();
     }
 
+    public byte[] getBytes (long offs, int len) throws Exception
+    {
+        RandomAccessFile ra = new RandomAccessFile (inputFile, "rws");
+        FileChannel chan = ra.getChannel();
+        MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, len);
+        byte[] ret = new byte[len];
+        buff.get(ret);
+        chan.close();
+        ra.close();
+        return ret;
+    }
+
     public void scrollUp()
     {
         offset += 8;
@@ -94,7 +106,6 @@ public class FileMapper
     public void setBytes (long address, byte[] data) throws Exception
     {
         System.arraycopy(data,0, mappedBytes,(int)(address-offset),data.length);
-        //byteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, offset, mappedLength);
         byteBuffer.position(0);
         byteBuffer.put (mappedBytes);
         byteBuffer.force();

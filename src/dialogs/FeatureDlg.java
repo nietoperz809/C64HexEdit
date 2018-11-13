@@ -1,5 +1,7 @@
 package dialogs;
 
+import main.FileMapper;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.xml.bind.DatatypeConverter;
@@ -18,6 +20,7 @@ public class FeatureDlg extends JDialog
 	private JTextField patternField;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
     private byte[] data;
+    private FileMapper mapper;
 
     private void allocDataField()
     {
@@ -38,9 +41,9 @@ public class FeatureDlg extends JDialog
         public long startPos;
     }
 
-    public static DlgRes startDlg()
+    public static DlgRes startDlg (FileMapper mapper)
     {
-        FeatureDlg dialog = new FeatureDlg();
+        FeatureDlg dialog = new FeatureDlg(mapper);
         dialog.setModal(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
@@ -57,25 +60,27 @@ public class FeatureDlg extends JDialog
         return res;
     }
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			FeatureDlg dialog = new FeatureDlg();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		try {
+//			FeatureDlg dialog = new FeatureDlg();
+//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//			dialog.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * Create the dialog.
 	 */
-	public FeatureDlg() {
-		setTitle("Fill with");
-		setBounds(100, 100, 346, 387);
+	public FeatureDlg (FileMapper mapper)
+    {
+		this.mapper = mapper;
+        setTitle("Fill with");
+        setBounds(100, 100, 346, 465);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -231,9 +236,34 @@ public class FeatureDlg extends JDialog
 		rdbtnPattern.setBounds(26, 268, 91, 25);
 		contentPanel.add(rdbtnPattern);
 
+        JRadioButton rdbtnXorWpattern = new JRadioButton("Xor FF");
+        rdbtnXorWpattern.addActionListener(arg0 ->
+        {
+            allocDataField();
+            try
+            {
+                long from = readInputBox(fromField);
+                byte[] orig = mapper.getBytes(from,data.length);
+                byte[] hex = DatatypeConverter.parseHexBinary(patternField.getText());
+                for (int s=0; s<data.length; s++)
+                {
+                    data[s] = (byte) (orig[s]^0xff);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        });
+        buttonGroup.add(rdbtnXorWpattern);
+        rdbtnXorWpattern.setBounds(26, 298, 91, 25);
+        contentPanel.add(rdbtnXorWpattern);
+
 		JLabel lblTextOrPattern = new JLabel("Text or Pattern");
 		lblTextOrPattern.setBounds(170, 118, 101, 16);
 		contentPanel.add(lblTextOrPattern);
+
+        rdbtnXorWpattern.setBounds(26, 302, 127, 25);
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));

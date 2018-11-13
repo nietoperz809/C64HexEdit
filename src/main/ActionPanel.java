@@ -17,6 +17,7 @@ public class ActionPanel
     private FileMapper mapper;
     private C64VideoMatrix matrix;
     private JTextField addressInput;
+    private JButton changeButton;
     private JScrollBar scroller;
 
     public FileMapper getMapper()
@@ -57,6 +58,8 @@ public class ActionPanel
                     mapper = new FileMapper (selectedFile, matrix);
                     matrix.setMapper(mapper);
                     mapper.displayLines();
+                    changeButton.setEnabled(true);
+                    addressInput.setEnabled(true);
                 }
                 catch (Exception e1)
                 {
@@ -77,13 +80,15 @@ public class ActionPanel
         panel2.add(openButton);
         addressInput = new JTextField("0x10000000");
         addressInput.setToolTipText("New position+ENTER");
+        addressInput.setEnabled(false);
         panel2.add(addressInput);
-        JButton bc = new JButton ("Change");
-        bc.addActionListener(e ->
+        changeButton = new JButton ("Change");
+        changeButton.setEnabled(false);
+        changeButton.addActionListener(e ->
         {
-            FeatureDlg.DlgRes res = FeatureDlg.startDlg();
-//            System.out.println(res.startPos);
-//            System.out.println(Arrays.toString(res.data));
+            FeatureDlg.DlgRes res = FeatureDlg.startDlg(mapper);
+            if (res.data == null)
+                return;
             try
             {
                 mapper.putBytes (res.data, res.startPos);
@@ -93,7 +98,7 @@ public class ActionPanel
                 e1.printStackTrace();
             }
         });
-        panel2.add (bc);
+        panel2.add (changeButton);
         fileName = new JLabel();
         fileName.setBackground(new Color(-16777216));
         fileName.setForeground(new Color(-16729088));
