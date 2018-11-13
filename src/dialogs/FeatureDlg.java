@@ -142,7 +142,7 @@ public class FeatureDlg extends JDialog
         JButton btnNewButton = new JButton("New Size");
         btnNewButton.addActionListener(e ->
         {
-            mapper.setFileSize(readInputBox(textField_3));
+            mapper.setFileSize (readInputBox(textField_3), true);
             this.dispose();
         });
         btnNewButton.setBounds(165, 268, 97, 25);

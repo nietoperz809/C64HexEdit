@@ -16,22 +16,34 @@ import static java.lang.String.format;
 
 public class FileMapper
 {
-    private static RandomAccessFile raFile;
+    private RandomAccessFile raFile;
+    private long filesize = 0;
     private final C64VideoMatrix matrix;
     private final byte[] mappedBytes = new byte[C64VideoMatrix.LINES_ON_SCREEN * 8];
-    private long filesize = 0;
     private File inputFile;
     private JScrollBar scroller;
 
     public FileMapper (File f, C64VideoMatrix matrix, JScrollBar scroller) throws Exception
     {
-        if (raFile != null)
-            raFile.close();
         this.matrix = matrix;
         this.inputFile = f;
         this.scroller = scroller;
         filesize = f.length();
         raFile = new RandomAccessFile(inputFile, "rws");
+    }
+
+    public void close()
+    {
+        try
+        {
+            setFileSize (filesize, false);
+            raFile.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public static void unmap (MappedByteBuffer buffer)
@@ -48,6 +60,9 @@ public class FileMapper
      */
     public void putBytes (byte[] dat, long offs) throws Exception
     {
+        long total = offs+dat.length;
+        if (total > filesize)
+            filesize = total;
         FileChannel chan = raFile.getChannel();
         MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, dat.length);
         buff.put(dat);
@@ -165,7 +180,7 @@ public class FileMapper
         }
     }
 
-    public void setFileSize (long size)
+    public void setFileSize (long size, boolean display)
     {
         FileChannel chan = raFile.getChannel();
         {
@@ -173,7 +188,8 @@ public class FileMapper
             {
                 chan.truncate(size);
                 filesize = size;
-                displayMap();
+                if (display)
+                    displayMap();
             }
             catch (Exception e)
             {
@@ -181,4 +197,9 @@ public class FileMapper
             }
         }
     }
+
+//    public void adjustFileSize ()
+//    {
+//        setFileSize (filesize, false);
+//    }
 }

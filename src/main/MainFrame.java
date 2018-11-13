@@ -4,6 +4,7 @@ import c64terminal.C64Panel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
@@ -11,7 +12,7 @@ public class MainFrame
 {
     private JPanel mainPanel;
     private C64Panel c64Panel1;
-    private ActionPanel nestedForm1;
+    private  ActionPanel nestedForm1;
     private JScrollBar scroller;
 
     public static void main (String[] args)
@@ -30,6 +31,15 @@ public class MainFrame
             public void windowLostFocus (WindowEvent e)
             {
                 //mf.c64Panel1.requestFocus();
+            }
+        });
+        frame.addWindowListener (new WindowAdapter()
+        {
+            @Override
+            public void windowClosing (WindowEvent e)
+            {
+                super.windowClosing(e);
+                mf.nestedForm1.getMapper().close();
             }
         });
         frame.setContentPane(mf.mainPanel);

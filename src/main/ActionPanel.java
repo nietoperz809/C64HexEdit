@@ -55,6 +55,8 @@ public class ActionPanel
                         String.format("%x", selectedFile.length()));
                 try
                 {
+                    if (mapper != null)
+                        mapper.close();
                     mapper = new FileMapper (selectedFile, matrix, scroller);
                     matrix.setMapper(mapper);
                     mapper.displayMap();
