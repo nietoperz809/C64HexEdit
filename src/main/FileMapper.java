@@ -179,6 +179,20 @@ public class FileMapper
 
     public void setFileSize (long size, boolean display)
     {
+        if (size > filesize)
+        {
+            byte[] b = new byte[(int)(size-filesize)];
+            try
+            {
+                putBytes (b,filesize);
+                filesize = size;
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            return;
+        }
         FileChannel chan = raFile.getChannel();
         {
             try
