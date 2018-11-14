@@ -73,7 +73,14 @@ public class MainFrame
         scroller = new JScrollBar(JScrollBar.VERTICAL, 0, 0x1000, 0, 0x7ffffff0);
         scroller.addAdjustmentListener(e ->
         {
-            nestedForm1.getMapper().setScrollbarOffset (e.getValue());
+            try
+            {
+                nestedForm1.getMapper().displayMap();
+            }
+            catch (Exception e1)
+            {
+                e1.printStackTrace();
+            }
         });
 
         mainPanel.add(scroller, BorderLayout.EAST);

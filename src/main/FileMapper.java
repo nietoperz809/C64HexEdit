@@ -94,6 +94,7 @@ public class FileMapper
     public void displayMap () throws Exception
     {
         getBytes(scroller.getValue(), mappedBytes);
+        setFileSize(filesize, false);
         for (int s = 0; s < C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
             C64Character[] c64 = matrix.get(s);
@@ -150,9 +151,6 @@ public class FileMapper
     public void scrollDown ()
     {
         scroller.setValue(scroller.getValue()-8);
-//        offset -= 8;
-//        if (offset < 0)
-//            offset = 0;
         try
         {
             displayMap();
@@ -169,7 +167,6 @@ public class FileMapper
      */
     public void setScrollbarOffset (long value)
     {
-        //offset = value;
         try
         {
             displayMap();

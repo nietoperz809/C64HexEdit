@@ -6,6 +6,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 
 import static tools.Misc.readInputBox;
@@ -33,6 +37,7 @@ public class FeatureDlg extends JDialog
     private final JPanel contentPanel = new JPanel();
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final JTextField textField_3;
+    private final JTextField labFile;
     private JTextField fromField;
     private JTextField sizeField;
     private JTextField patternField;
@@ -118,8 +123,27 @@ public class FeatureDlg extends JDialog
 
         JRadioButton rdbtnXorWpattern = new MyRadio("Xor FF");
         buttonGroup.add(rdbtnXorWpattern);
-        rdbtnXorWpattern.setBounds(26, 302, 127, 25);
+        rdbtnXorWpattern.setBounds(26, 302, 127, 25);       // ystep = 34
         contentPanel.add(rdbtnXorWpattern);
+
+        labFile = new JTextField();
+        labFile.setBounds(130, 336, 180, 25);
+        contentPanel.add(labFile);
+
+        JRadioButton rbFile = new MyRadio("File Data ->");
+        buttonGroup.add(rbFile);
+        rbFile.setBounds(26, 336, 100, 25);
+        contentPanel.add(rbFile);
+        rbFile.addActionListener(e ->
+        {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+            int result = fileChooser.showOpenDialog(FeatureDlg.this);
+            if (result == JFileChooser.APPROVE_OPTION)
+            {
+                labFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            }
+        });
 
         JLabel lblTextOrPattern = new JLabel("Text or Pattern");
         lblTextOrPattern.setBounds(170, 125, 101, 16);
@@ -274,6 +298,19 @@ public class FeatureDlg extends JDialog
                     e.printStackTrace();
                 }
                 break;
+
+            case "11":
+            {
+                try
+                {
+                    data = Files.readAllBytes(Paths.get(labFile.getText()));
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            break;
         }
     }
 
@@ -294,4 +331,19 @@ public class FeatureDlg extends JDialog
         public byte[] data;
         public long startPos;
     }
+
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args)
+    {
+        try {
+            FeatureDlg dialog = new FeatureDlg(null);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            dialog.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
