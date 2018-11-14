@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactManager">
+    <artifact type="jar" name="C64HexEdit:jar">
+      <output-path>$PROJECT_DIR$/jarfile/C64HexEdit_jar</output-path>
+      <root id="archive" name="C64HexEdit.jar">
+        <element id="module-output" name="C64HexEdit" />
+      </root>
+    </artifact>
+  </component>
   <component name="Encoding">
     <file url="PROJECT" charset="UTF-8" />
   </component>
