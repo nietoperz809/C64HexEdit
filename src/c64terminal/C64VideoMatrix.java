@@ -17,6 +17,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     public static final int CHARS_PER_LINE = 41;
     private static final int NO_CHARACTER = ' ';
     static final int SCALE=16;
+    private final C64Panel pane;
     public ConstantRing valid_xpos =
             new ConstantRing(new int[]{9,10,12,13,15,16,18,19,21,22,24,25,27,28,30,31});
 
@@ -32,13 +33,15 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     {
         mapper = f;
     }
+
     public FileMapper getMapper ()
     {
         return mapper;
     }
 
-    public C64VideoMatrix ()
+    public C64VideoMatrix (C64Panel pane)
     {
+        this.pane = pane;
         clearScreen();
     }
 
@@ -157,6 +160,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
             if (mapper != null)
                 mapper.scrollDown();
         }
+        pane.repaint();
     }
 
     /**
@@ -173,6 +177,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
             if (mapper != null)
                 mapper.scrollUp();
         }
+        pane.repaint();
     }
 
     /**
@@ -182,6 +187,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     {
         if (currentCursorPos.x > 0)
             currentCursorPos.x = valid_xpos.prev(currentCursorPos.x);
+        pane.repaint();
     }
 
 
@@ -192,6 +198,7 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
     {
         if (currentCursorPos.x < CHARS_PER_LINE-1)
             currentCursorPos.x = valid_xpos.next(currentCursorPos.x);
+        pane.repaint();
     }
 
 //    /**
@@ -221,18 +228,18 @@ public class C64VideoMatrix extends ArrayList<C64Character[]>
 //    }
 
 
-    /**
-     * Convert screen memory address to coordinates
-     * @param addr memory address, must be >= 1024 and <= 1024+25*40
-     * @return a point givin the x/y coordinates
-     */
-    private Point elementfromAddress (int addr) throws Exception
-    {
-        Point p = new Point (addr % CHARS_PER_LINE, addr / CHARS_PER_LINE);
-        if (p.y >= LINES_ON_SCREEN+1)
-            throw new Exception("Wrong screen address");
-        return p;
-    }
+//    /**
+//     * Convert screen memory address to coordinates
+//     * @param addr memory address, must be >= 1024 and <= 1024+25*40
+//     * @return a point givin the x/y coordinates
+//     */
+//    private Point elementfromAddress (int addr) throws Exception
+//    {
+//        Point p = new Point (addr % CHARS_PER_LINE, addr / CHARS_PER_LINE);
+//        if (p.y >= LINES_ON_SCREEN+1)
+//            throw new Exception("Wrong screen address");
+//        return p;
+//    }
 
 //    /**
 //     * Get value at specified address

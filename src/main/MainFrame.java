@@ -12,7 +12,7 @@ public class MainFrame
 {
     private JPanel mainPanel;
     private C64Panel c64Panel1;
-    private  ActionPanel nestedForm1;
+    private ActionPanel nestedForm1;
     private JScrollBar scroller;
 
     public static void main (String[] args)
@@ -39,7 +39,9 @@ public class MainFrame
             public void windowClosing (WindowEvent e)
             {
                 super.windowClosing(e);
-                mf.nestedForm1.getMapper().close();
+                FileMapper mapper = mf.nestedForm1.getMapper();
+                if (mapper != null)
+                mapper.close();
             }
         });
         frame.setContentPane(mf.mainPanel);

@@ -3,9 +3,7 @@ package c64terminal;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +14,7 @@ import static java.awt.event.KeyEvent.VK_ENTER;
 public class C64Panel extends JPanel
 {
     private final static int SCALE=16;
-    private final C64VideoMatrix matrix = new C64VideoMatrix();
+    private final C64VideoMatrix matrix = new C64VideoMatrix(this);
     //private final RingBuffer<Character> ringBuff = new RingBuffer<>(40);
 
     public C64VideoMatrix getMatrix()
@@ -31,6 +29,14 @@ public class C64Panel extends JPanel
         setPreferredSize(new Dimension(
                 C64VideoMatrix.CHARS_PER_LINE*SCALE,
                 C64VideoMatrix.LINES_ON_SCREEN*SCALE));
+
+        addMouseWheelListener(e ->
+        {
+            if (e.getWheelRotation()<0)
+                matrix.up();
+            else
+                matrix.down();
+        });
 
         addMouseListener(new MouseInputAdapter()
         {
