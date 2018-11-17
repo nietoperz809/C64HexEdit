@@ -4,11 +4,11 @@ import c64terminal.C64Character;
 import c64terminal.C64Color;
 import c64terminal.C64VideoMatrix;
 import c64terminal.CharacterWriter;
-import sun.nio.ch.DirectBuffer;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 
@@ -46,10 +46,24 @@ public class FileMapper
 
     }
 
-    public static void unmap (MappedByteBuffer buffer)
+//    public static void unmap (MappedByteBuffer buffer)
+//    {
+//        sun.misc.Cleaner cleaner = ((DirectBuffer) buffer).cleaner();
+//        cleaner.clean();
+//    }
+
+    public static void unmap (MappedByteBuffer buffer, Class channelClass)
     {
-        sun.misc.Cleaner cleaner = ((DirectBuffer) buffer).cleaner();
-        cleaner.clean();
+        try
+        {
+            Method unmap = channelClass.getDeclaredMethod("unmap", MappedByteBuffer.class);
+            unmap.setAccessible(true);
+            unmap.invoke(channelClass, buffer);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -68,7 +82,7 @@ public class FileMapper
         buff.put(dat);
         buff.force();
         //offset = offs;
-        unmap (buff);
+        unmap (buff, chan.getClass());
         displayMap();
     }
 
@@ -83,7 +97,7 @@ public class FileMapper
         FileChannel chan = raFile.getChannel();
         MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_ONLY, offs, dest.length);
         buff.get(dest);
-        unmap (buff);
+        unmap (buff, chan.getClass());
     }
 
 
@@ -161,21 +175,21 @@ public class FileMapper
         }
     }
 
-    /**
-     * Scrollbar is moved
-     * @param value Scrollbar value
-     */
-    public void setScrollbarOffset (long value)
-    {
-        try
-        {
-            displayMap();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * Scrollbar is moved
+//     * @param value Scrollbar value
+//     */
+//    public void setScrollbarOffset (long value)
+//    {
+//        try
+//        {
+//            displayMap();
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//        }
+//    }
 
     public void setFileSize (long size, boolean display)
     {

@@ -86,6 +86,7 @@ public class ActionPanel
         addressInput.setEnabled(false);
         panel2.add(addressInput);
         changeButton = new JButton ("Change");
+        changeButton.setToolTipText("Open file manipulation dialog");
         changeButton.setEnabled(false);
         changeButton.addActionListener(e ->
         {

@@ -83,56 +83,57 @@ public class FeatureDlg extends JDialog
 
         JRadioButton rdbtnCountDown = new MyRadio("Count down");
         buttonGroup.add(rdbtnCountDown);
-        rdbtnCountDown.setBounds(26, 58, 116, 25);
+        rdbtnCountDown.setBounds(26, 48, 116, 25);
         contentPanel.add(rdbtnCountDown);
 
         JRadioButton rdbtnZeros = new MyRadio("Zeros");
         buttonGroup.add(rdbtnZeros);
-        rdbtnZeros.setBounds(26, 88, 91, 25);
+        rdbtnZeros.setBounds(26, 68, 91, 25);
         contentPanel.add(rdbtnZeros);
 
         JRadioButton rdbtnFfs = new MyRadio("FF's");
         buttonGroup.add(rdbtnFfs);
-        rdbtnFfs.setBounds(26, 118, 127, 25);
+        rdbtnFfs.setBounds(26, 88, 100, 25);
         contentPanel.add(rdbtnFfs);
 
         JRadioButton rdbtnaa = new MyRadio("55AA");
         buttonGroup.add(rdbtnaa);
-        rdbtnaa.setBounds(26, 148, 101, 25);
+        rdbtnaa.setBounds(26, 108, 100, 25);
         contentPanel.add(rdbtnaa);
 
         JRadioButton rdbtnAa = new MyRadio("AA55");
         buttonGroup.add(rdbtnAa);
-        rdbtnAa.setBounds(26, 178, 127, 25);
+        rdbtnAa.setBounds(26, 128, 100, 25);
         contentPanel.add(rdbtnAa);
 
         JRadioButton rdbtnRandom = new MyRadio("Random");
         buttonGroup.add(rdbtnRandom);
-        rdbtnRandom.setBounds(26, 208, 82, 25);
+        rdbtnRandom.setBounds(26, 148, 82, 25);
         contentPanel.add(rdbtnRandom);
 
         JRadioButton rdbtnText = new MyRadio("Text");
         buttonGroup.add(rdbtnText);
-        rdbtnText.setBounds(26, 238, 67, 25);
+        rdbtnText.setBounds(26, 168, 67, 25);
         contentPanel.add(rdbtnText);
 
         JRadioButton rdbtnPattern = new MyRadio("Hex Pattern");
         buttonGroup.add(rdbtnPattern);
-        rdbtnPattern.setBounds(26, 268, 91, 25);
+        rdbtnPattern.setBounds(26, 188, 91, 25);
         contentPanel.add(rdbtnPattern);
 
         JRadioButton rdbtnXorWpattern = new MyRadio("Xor FF");
         buttonGroup.add(rdbtnXorWpattern);
-        rdbtnXorWpattern.setBounds(26, 302, 127, 25);       // ystep = 34
+        rdbtnXorWpattern.setBounds(26, 208, 127, 25);       
         contentPanel.add(rdbtnXorWpattern);
 
         labFile = new JTextField();
-        labFile.setBounds(130, 336, 180, 25);
+        labFile.setBounds(20, 336, 280, 25);
+        labFile.setEditable(false);
         contentPanel.add(labFile);
 
-        JRadioButton rbFile = new MyRadio("File Data ->");
+        JRadioButton rbFile = new MyRadio("File Data");
         buttonGroup.add(rbFile);
-        rbFile.setBounds(26, 336, 100, 25);
+        rbFile.setBounds(26, 228, 100, 25);
         contentPanel.add(rbFile);
         rbFile.addActionListener(e ->
         {
