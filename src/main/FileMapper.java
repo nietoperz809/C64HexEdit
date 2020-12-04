@@ -7,10 +7,14 @@ import c64terminal.CharacterWriter;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
 import java.lang.reflect.Method;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static java.lang.String.format;
 
@@ -22,15 +26,37 @@ public class FileMapper
     private final byte[] mappedBytes = new byte[C64VideoMatrix.LINES_ON_SCREEN * 8];
     private File inputFile;
     private JScrollBar scroller;
+    private boolean fakeFile;
 
     public FileMapper (File f, C64VideoMatrix matrix, JScrollBar scroller) throws Exception
     {
+        fakeFile = false;
         this.matrix = matrix;
-        this.inputFile = f;
         this.scroller = scroller;
-        filesize = f.length();
-        raFile = new RandomAccessFile(inputFile, "rws");
+        try {
+            inputFile = f;
+            filesize = f.length();
+            raFile = new RandomAccessFile(inputFile, "rws");
+        } catch (FileNotFoundException e) {
+            fakeFile = true;
+            Path tempFile = Files.createTempFile(null, null);
+            Files.write(tempFile, "dummy data\n".getBytes(StandardCharsets.US_ASCII));
+            inputFile = tempFile.toFile();
+            inputFile.deleteOnExit();
+            filesize = inputFile.length();
+            raFile = new RandomAccessFile (inputFile, "rws");
+        }
     }
+
+    public boolean isFakeFile()
+    {
+        return fakeFile;
+    }
+
+//    public File getFile()
+//    {
+//        return inputFile;
+//    }
 
     public void close()
     {
@@ -43,16 +69,9 @@ public class FileMapper
         {
             e.printStackTrace();
         }
-
     }
 
-//    public static void unmap (MappedByteBuffer buffer)
-//    {
-//        sun.misc.Cleaner cleaner = ((DirectBuffer) buffer).cleaner();
-//        cleaner.clean();
-//    }
-
-    public static void unmap (MappedByteBuffer buffer, Class channelClass)
+    public static void unmap (MappedByteBuffer buffer, Class<? extends FileChannel> channelClass)
     {
         try
         {
@@ -81,7 +100,6 @@ public class FileMapper
         MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, dat.length);
         buff.put(dat);
         buff.force();
-        //offset = offs;
         unmap (buff, chan.getClass());
         displayMap();
     }
@@ -105,9 +123,13 @@ public class FileMapper
      * Draws mapped bytes into C64 display
      * @throws Exception if something went wrong
      */
-    public void displayMap () throws Exception
+    public void displayMap ()
     {
-        getBytes(scroller.getValue(), mappedBytes);
+        try {
+            getBytes(scroller.getValue(), mappedBytes);
+        } catch (Exception e) {
+            return;
+        }
         setFileSize(filesize, false);
         for (int s = 0; s < C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
@@ -120,7 +142,7 @@ public class FileMapper
                 int idx = 3 * t + 9;
                 int src_idx = t + s * 8;
                 String temp = String.format("%02x", mappedBytes[src_idx]);
-                C64Color col = isPosFileEnd(t, s) ? C64Color.BLACK : C64Color.WHITE;
+                C64Color col = isPosFileEnd(t, s) ? C64Color.GREEN : C64Color.WHITE;
                 cw.writeChar(c64[idx], temp.charAt(0), col);
                 cw.writeChar(c64[idx + 1], temp.charAt(1), col);
                 idx = 33 + t;
@@ -134,11 +156,10 @@ public class FileMapper
      * @param t Inner loop counter
      * @param s Outer loop counter
      * @return true or false
-     * @throws Exception if something went wrong
      */
-    private boolean isPosFileEnd (int t, int s) throws Exception
+    private boolean isPosFileEnd (int t, int s)
     {
-        long pos = scroller.getValue() + s * 8 + t;
+        long pos = scroller.getValue() + s * 8L + t;
         return pos == filesize;
     }
 

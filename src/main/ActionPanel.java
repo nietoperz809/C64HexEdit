@@ -2,6 +2,7 @@ package main;
 
 import c64terminal.C64VideoMatrix;
 import dialogs.FeatureDlg;
+import tools.Misc;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +59,10 @@ public class ActionPanel
                     if (mapper != null)
                         mapper.close();
                     mapper = new FileMapper (selectedFile, matrix, scroller);
+                    if (mapper.isFakeFile())
+                    {
+                        Misc.errorBox(thisPanel,"using Fake File", "File not accessible");
+                    }
                     matrix.setMapper(mapper);
                     mapper.displayMap();
                     changeButton.setEnabled(true);
