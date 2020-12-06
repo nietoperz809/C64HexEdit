@@ -8,6 +8,11 @@ public class Misc {
         JOptionPane.showMessageDialog(c, msg, title, JOptionPane.ERROR_MESSAGE);
     }
 
+    public static boolean isHexChar(char c1)
+    {
+        return ((c1 >= '0' && c1 <= '9') || (c1 >= 'a' && c1 <= 'f'));
+    }
+
     public static long readInputBox(JTextField tf, long oldvalue) throws NumberFormatException {
         int state = 0;
         long res = 0;

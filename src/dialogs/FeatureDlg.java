@@ -11,29 +11,26 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.util.Arrays;
 
 import static tools.Misc.readInputBox;
 
 
-class MyRadio extends JRadioButton
-{
+class MyRadio extends JRadioButton {
     private static int counter;
 
-    static void setCounter (int num)
-    {
+    static void setCounter(int num) {
         counter = num;
     }
 
-    MyRadio (String txt)
-    {
+    MyRadio(String txt) {
         super(txt);
         setActionCommand("" + counter);
         counter++;
     }
 }
 
-public class FeatureDlg extends JDialog
-{
+public class FeatureDlg extends JDialog {
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final JTextField textField_3;
     private final JTextField labFile;
@@ -46,8 +43,7 @@ public class FeatureDlg extends JDialog
     /**
      * Create the dialog.
      */
-    public FeatureDlg (FileMapper mapper)
-    {
+    public FeatureDlg(FileMapper mapper) {
         this.mapper = mapper;
         MyRadio.setCounter(1);
         setTitle("Fill with");
@@ -123,7 +119,7 @@ public class FeatureDlg extends JDialog
 
         JRadioButton rdbtnXorWpattern = new MyRadio("Xor FF");
         buttonGroup.add(rdbtnXorWpattern);
-        rdbtnXorWpattern.setBounds(26, 208, 127, 25);       
+        rdbtnXorWpattern.setBounds(26, 208, 127, 25);
         contentPanel.add(rdbtnXorWpattern);
 
         labFile = new JTextField();
@@ -140,8 +136,7 @@ public class FeatureDlg extends JDialog
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int result = fileChooser.showOpenDialog(FeatureDlg.this);
-            if (result == JFileChooser.APPROVE_OPTION)
-            {
+            if (result == JFileChooser.APPROVE_OPTION) {
                 labFile.setText(fileChooser.getSelectedFile().getAbsolutePath());
             }
         });
@@ -167,7 +162,7 @@ public class FeatureDlg extends JDialog
         JButton btnNewButton = new JButton("New Size");
         btnNewButton.addActionListener(e ->
         {
-            mapper.setFileSize (readInputBox(textField_3, mapper.getFilesize()));
+            mapper.setFileSize(readInputBox(textField_3, mapper.getFilesize()));
             mapper.displayMap();
             //this.dispose();
         });
@@ -193,72 +188,56 @@ public class FeatureDlg extends JDialog
         });
     }
 
-    public static DlgRes startDlg (FileMapper mapper)
-    {
+    public static DlgRes startDlg(FileMapper mapper) {
         FeatureDlg dialog = new FeatureDlg(mapper);
         dialog.setModal(true);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setVisible(true);
         DlgRes res = new DlgRes();
         res.data = dialog.data;
-        try
-        {
+        try {
             res.startPos = readInputBox(dialog.fromField, -1);
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             res.startPos = 0;
         }
         return res;
     }
 
-    private void handleRadioButton ()
-    {
+    private void handleRadioButton() {
         ButtonModel mod = buttonGroup.getSelection();
         if (mod == null)
             return;
         allocDataField();
         String act = mod.getActionCommand();
-        switch (act)
-        {
+        switch (act) {
             case "1":
-                for (int s = 0; s < data.length; s++)
-                {
+                for (int s = 0; s < data.length; s++) {
                     data[s] = (byte) s;
                 }
                 break;
 
             case "2":
-                for (int s = 0; s < data.length; s++)
-                {
-                    data[s] = (byte) (255-s);
+                for (int s = 0; s < data.length; s++) {
+                    data[s] = (byte) (255 - s);
                 }
                 break;
 
             case "3":
-                for (int s = 0; s < data.length; s++)
-                {
-                    data[s] = 0;
-                }
+                Arrays.fill(data, (byte) 0);
                 break;
 
             case "4":
-                for (int s = 0; s < data.length; s++)
-                {
-                    data[s] = (byte) 0xff;
-                }
+                Arrays.fill(data, (byte) 0xff);
                 break;
 
             case "5":
-                for (int s = 0; s < data.length; s++)
-                {
+                for (int s = 0; s < data.length; s++) {
                     data[s] = (byte) (s % 2 == 0 ? 0x55 : 0xaa);
                 }
                 break;
 
             case "6":
-                for (int s = 0; s < data.length; s++)
-                {
+                for (int s = 0; s < data.length; s++) {
                     data[s] = (byte) (s % 2 == 1 ? 0x55 : 0xaa);
                 }
                 break;
@@ -270,45 +249,35 @@ public class FeatureDlg extends JDialog
 
             case "8":
                 byte[] pat = patternField.getText().getBytes();
-                for (int s = 0; s < data.length; s++)
-                {
+                for (int s = 0; s < data.length; s++) {
                     data[s] = pat[s % pat.length];
                 }
                 break;
 
             case "9":
                 byte[] hex = DatatypeConverter.parseHexBinary(patternField.getText());
-                for (int s = 0; s < data.length; s++)
-                {
+                for (int s = 0; s < data.length; s++) {
                     data[s] = hex[s % hex.length];
                 }
                 break;
 
             case "10":
-                try
-                {
+                try {
                     long from = readInputBox(fromField, -1);
-                    byte[] orig = new byte [data.length];
+                    byte[] orig = new byte[data.length];
                     mapper.getBytes(from, orig);
-                    for (int s = 0; s < data.length; s++)
-                    {
+                    for (int s = 0; s < data.length; s++) {
                         data[s] = (byte) (orig[s] ^ 0xff);
                     }
-                }
-                catch (Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 break;
 
-            case "11":
-            {
-                try
-                {
+            case "11": {
+                try {
                     data = Files.readAllBytes(Paths.get(labFile.getText()));
-                }
-                catch (IOException e)
-                {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -316,20 +285,15 @@ public class FeatureDlg extends JDialog
         }
     }
 
-    private void allocDataField ()
-    {
-        try
-        {
+    private void allocDataField() {
+        try {
             data = new byte[(int) readInputBox(sizeField, -1)];
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             data = new byte[1];
         }
     }
 
-    static public class DlgRes
-    {
+    static public class DlgRes {
         public byte[] data;
         public long startPos;
     }
@@ -337,8 +301,7 @@ public class FeatureDlg extends JDialog
     /**
      * Launch the application.
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         try {
             FeatureDlg dialog = new FeatureDlg(null);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

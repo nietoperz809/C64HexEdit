@@ -1,5 +1,7 @@
 package c64terminal;
 
+import tools.Misc;
+
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 import java.awt.*;
@@ -44,14 +46,18 @@ public class C64Panel extends JPanel {
         addKeyListener(new KeyAdapter() {
 
             boolean handleNormalKey(KeyEvent e) {
-                char c = CharacterWriter.getInstance().mapPCtoCBM(e.getKeyChar());
-                if (!matrix.isValidKey(c, e.getKeyCode(), e.isActionKey()))
-                    return false;
-                matrix.putChar(c);
-                return true;
+                char c1 = e.getKeyChar();
+                if (Misc.isHexChar(c1)) {
+                    char c = CharacterWriter.getInstance().mapPCtoCBM(c1);
+                    if (!matrix.isValidKey(c, e.getKeyCode(), e.isActionKey()))
+                        return false;
+                    matrix.putChar(c);
+                    return true;
+                }
+                return false;
             }
 
-            void handleEnter() {
+            void writeMap() {
                 char[] arr = matrix.readLine();
                 long address = Long.parseLong(String.valueOf(arr, 0, 8), 16);
                 byte[] bt = new byte[8];
@@ -94,7 +100,7 @@ public class C64Panel extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (handleNormalKey(e))
-                    handleEnter();
+                    writeMap();
                 else
                     handleCursorMove(e);
                 repaint();
