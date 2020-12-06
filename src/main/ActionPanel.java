@@ -10,8 +10,7 @@ import java.io.File;
 
 import static tools.Misc.readInputBox;
 
-public class ActionPanel
-{
+public class ActionPanel {
     private JPanel thisPanel;
     private JButton openButton;
     private JLabel fileName;
@@ -21,63 +20,57 @@ public class ActionPanel
     private JButton changeButton;
     private JScrollBar scroller;
 
-    public FileMapper getMapper()
-    {
+    public FileMapper getMapper() {
         return mapper;
     }
 
-    public ActionPanel (final C64VideoMatrix mat, JScrollBar scr)
-    {
+    public void fileOpen() {
+        openButton.doClick();
+    }
+
+    public ActionPanel(final C64VideoMatrix mat, JScrollBar scr) {
         setupUI();
         matrix = mat;
         scroller = scr;
 
-        addressInput.addActionListener(e ->
-        {
-            try
-            {
-                scroller.setValue((int)readInputBox(addressInput));
-            }
-            catch (Exception e1)
-            {
+        addressInput.addActionListener(e -> {
+            try {
+                scroller.setValue((int) readInputBox(addressInput, -1));
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });
 
-        openButton.addActionListener(e ->
-        {
+        openButton.addActionListener(e -> {
             JFileChooser fileChooser = new JFileChooser();
             fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
             int result = fileChooser.showOpenDialog(thisPanel);
-            if (result == JFileChooser.APPROVE_OPTION)
-            {
+            if (result == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fileChooser.getSelectedFile();
-                fileName.setText(selectedFile.getAbsolutePath() + " : "+
+                fileName.setText(selectedFile.getAbsolutePath() + " : " +
                         String.format("%x", selectedFile.length()));
-                try
-                {
+                try {
                     if (mapper != null)
                         mapper.close();
-                    mapper = new FileMapper (selectedFile, matrix, scroller);
-                    if (mapper.isFakeFile())
-                    {
-                        Misc.errorBox(thisPanel,"using Fake File", "File not accessible");
+                    mapper = new FileMapper(selectedFile, matrix, scroller);
+                    if (mapper.isFakeFile()) {
+                        Misc.errorBox(thisPanel, "using Fake File", "File not accessible");
                     }
                     matrix.setMapper(mapper);
                     mapper.displayMap();
                     changeButton.setEnabled(true);
                     addressInput.setEnabled(true);
-                }
-                catch (Exception e1)
-                {
+                } catch (Exception e1) {
                     e1.printStackTrace();
                 }
+            } else {
+                Misc.errorBox(thisPanel, "File required", "App will close now");
+                System.exit(1);
             }
         });
     }
 
-    private void setupUI()
-    {
+    private void setupUI() {
         thisPanel = new JPanel();
         thisPanel.setLayout(new BorderLayout(0, 0));
         final JPanel panel2 = new JPanel();
@@ -90,24 +83,20 @@ public class ActionPanel
         addressInput.setToolTipText("New position+ENTER");
         addressInput.setEnabled(false);
         panel2.add(addressInput);
-        changeButton = new JButton ("Change");
+        changeButton = new JButton("Change");
         changeButton.setToolTipText("Open file manipulation dialog");
         changeButton.setEnabled(false);
-        changeButton.addActionListener(e ->
-        {
+        changeButton.addActionListener(e -> {
             FeatureDlg.DlgRes res = FeatureDlg.startDlg(mapper);
             if (res.data == null)
                 return;
-            try
-            {
-                mapper.putBytes (res.data, res.startPos);
-            }
-            catch (Exception e1)
-            {
+            try {
+                mapper.putBytes(res.data, res.startPos);
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
         });
-        panel2.add (changeButton);
+        panel2.add(changeButton);
         fileName = new JLabel();
         fileName.setHorizontalAlignment(0);
         fileName.setOpaque(true);
@@ -118,8 +107,7 @@ public class ActionPanel
     /**
      * @noinspection ALL
      */
-    public JComponent getRootComponent ()
-    {
+    public JComponent getRootComponent() {
         return thisPanel;
     }
 }

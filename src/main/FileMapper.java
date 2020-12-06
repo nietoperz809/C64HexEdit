@@ -21,12 +21,11 @@ import static java.lang.String.format;
 public class FileMapper
 {
     private RandomAccessFile raFile;
-    private long filesize = 0;
+    private long filesize;
     private final C64VideoMatrix matrix;
-    private final byte[] mappedBytes = new byte[C64VideoMatrix.LINES_ON_SCREEN * 8];
-    private File inputFile;
-    private JScrollBar scroller;
+    private final JScrollBar scroller;
     private boolean fakeFile;
+    private final byte[] mappedBytes = new byte[C64VideoMatrix.LINES_ON_SCREEN * 8];
 
     public FileMapper (File f, C64VideoMatrix matrix, JScrollBar scroller) throws Exception
     {
@@ -34,17 +33,16 @@ public class FileMapper
         this.matrix = matrix;
         this.scroller = scroller;
         try {
-            inputFile = f;
             filesize = f.length();
-            raFile = new RandomAccessFile(inputFile, "rws");
+            raFile = new RandomAccessFile(f, "rws");
         } catch (FileNotFoundException e) {
             fakeFile = true;
             Path tempFile = Files.createTempFile(null, null);
             Files.write(tempFile, "dummy data\n".getBytes(StandardCharsets.US_ASCII));
-            inputFile = tempFile.toFile();
-            inputFile.deleteOnExit();
-            filesize = inputFile.length();
-            raFile = new RandomAccessFile (inputFile, "rws");
+            f = tempFile.toFile();
+            f.deleteOnExit();
+            filesize = f.length();
+            raFile = new RandomAccessFile (f, "rws");
         }
     }
 
@@ -53,16 +51,11 @@ public class FileMapper
         return fakeFile;
     }
 
-//    public File getFile()
-//    {
-//        return inputFile;
-//    }
-
     public void close()
     {
         try
         {
-            setFileSize (filesize, false);
+            setFileSize (filesize);
             raFile.close();
         }
         catch (Exception e)
@@ -85,6 +78,16 @@ public class FileMapper
         }
     }
 
+    int efflen (long max, long offset, int datlen)
+    {
+        if (offset > max)
+            return 0;
+        long top = offset+datlen;
+        if (top<=max)
+            return datlen;
+        return (int)(datlen-(top-max));
+    }
+
     /**
      * Write bytes into file
      * @param dat bytes to write
@@ -93,12 +96,10 @@ public class FileMapper
      */
     public void putBytes (byte[] dat, long offs) throws Exception
     {
-        long total = offs+dat.length;
-        if (total > filesize)
-            filesize = total;
+        int len = (int)efflen (filesize, offs, dat.length);
         FileChannel chan = raFile.getChannel();
-        MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, dat.length);
-        buff.put(dat);
+        MappedByteBuffer buff = chan.map(FileChannel.MapMode.READ_WRITE, offs, len);
+        buff.put(dat,0,len);
         buff.force();
         unmap (buff, chan.getClass());
         displayMap();
@@ -130,7 +131,7 @@ public class FileMapper
         } catch (Exception e) {
             return;
         }
-        setFileSize(filesize, false);
+        setFileSize(filesize);
         for (int s = 0; s < C64VideoMatrix.LINES_ON_SCREEN; s++)
         {
             C64Character[] c64 = matrix.get(s);
@@ -212,7 +213,12 @@ public class FileMapper
 //        }
 //    }
 
-    public void setFileSize (long size, boolean display)
+    public long getFilesize()
+    {
+        return filesize;
+    }
+
+    public void setFileSize (long size)
     {
         if (size > filesize)
         {
@@ -234,8 +240,6 @@ public class FileMapper
             {
                 chan.truncate(size);
                 filesize = size;
-                if (display)
-                    displayMap();
             }
             catch (Exception e)
             {
@@ -243,9 +247,4 @@ public class FileMapper
             }
         }
     }
-
-//    public void adjustFileSize ()
-//    {
-//        setFileSize (filesize, false);
-//    }
 }

@@ -34,15 +34,14 @@ class MyRadio extends JRadioButton
 
 public class FeatureDlg extends JDialog
 {
-    private final JPanel contentPanel = new JPanel();
     private final ButtonGroup buttonGroup = new ButtonGroup();
     private final JTextField textField_3;
     private final JTextField labFile;
-    private JTextField fromField;
-    private JTextField sizeField;
-    private JTextField patternField;
+    private final JTextField fromField;
+    private final JTextField sizeField;
+    private final JTextField patternField;
     private byte[] data;
-    private FileMapper mapper;
+    private final FileMapper mapper;
 
     /**
      * Create the dialog.
@@ -54,6 +53,7 @@ public class FeatureDlg extends JDialog
         setTitle("Fill with");
         setBounds(100, 100, 346, 465);
         getContentPane().setLayout(new BorderLayout());
+        JPanel contentPanel = new JPanel();
         contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(contentPanel, BorderLayout.CENTER);
         contentPanel.setLayout(null);
@@ -167,8 +167,9 @@ public class FeatureDlg extends JDialog
         JButton btnNewButton = new JButton("New Size");
         btnNewButton.addActionListener(e ->
         {
-            mapper.setFileSize (readInputBox(textField_3), true);
-            this.dispose();
+            mapper.setFileSize (readInputBox(textField_3, mapper.getFilesize()));
+            mapper.displayMap();
+            //this.dispose();
         });
         btnNewButton.setBounds(165, 268, 97, 25);
         contentPanel.add(btnNewButton);
@@ -202,7 +203,7 @@ public class FeatureDlg extends JDialog
         res.data = dialog.data;
         try
         {
-            res.startPos = readInputBox(dialog.fromField);
+            res.startPos = readInputBox(dialog.fromField, -1);
         }
         catch (Exception e)
         {
@@ -286,7 +287,7 @@ public class FeatureDlg extends JDialog
             case "10":
                 try
                 {
-                    long from = readInputBox(fromField);
+                    long from = readInputBox(fromField, -1);
                     byte[] orig = new byte [data.length];
                     mapper.getBytes(from, orig);
                     for (int s = 0; s < data.length; s++)
@@ -319,7 +320,7 @@ public class FeatureDlg extends JDialog
     {
         try
         {
-            data = new byte[(int) readInputBox(sizeField)];
+            data = new byte[(int) readInputBox(sizeField, -1)];
         }
         catch (Exception e)
         {

@@ -8,94 +8,71 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static com.sun.glass.events.KeyEvent.VK_BACKSPACE;
-import static java.awt.event.KeyEvent.VK_ENTER;
-
-public class C64Panel extends JPanel
-{
-    private final static int SCALE=16;
+public class C64Panel extends JPanel {
+    private final static int SCALE = 16;
     private final C64VideoMatrix matrix = new C64VideoMatrix(this);
     //private final RingBuffer<Character> ringBuff = new RingBuffer<>(40);
 
-    public C64VideoMatrix getMatrix()
-    {
+    public C64VideoMatrix getMatrix() {
         return matrix;
     }
 
-    public C64Panel ()
-    {
+    public C64Panel() {
         setDoubleBuffered(true);
         setFocusable(true);
         setPreferredSize(new Dimension(
-                C64VideoMatrix.CHARS_PER_LINE*SCALE,
-                C64VideoMatrix.LINES_ON_SCREEN*SCALE));
+                C64VideoMatrix.CHARS_PER_LINE * SCALE,
+                C64VideoMatrix.LINES_ON_SCREEN * SCALE));
 
         addMouseWheelListener(e ->
         {
-            if (e.getWheelRotation()<0)
+            if (e.getWheelRotation() < 0)
                 matrix.up();
             else
                 matrix.down();
         });
 
-        addMouseListener(new MouseInputAdapter()
-        {
+        addMouseListener(new MouseInputAdapter() {
             @Override
-            public void mouseClicked (MouseEvent e)
-            {
+            public void mouseClicked(MouseEvent e) {
                 requestFocusInWindow();
-                matrix.setCursorPos(e.getX()/C64VideoMatrix.SCALE,
-                        e.getY()/C64VideoMatrix.SCALE);
+                matrix.setCursorPos(e.getX() / C64VideoMatrix.SCALE,
+                        e.getY() / C64VideoMatrix.SCALE);
             }
         });
 
-        addKeyListener(new KeyAdapter()
-        {
-            void handleKey (KeyEvent e)
-            {
-                char c = e.getKeyChar();
-                if (c == VK_ENTER)
-                {
-                    char[] arr = matrix.readLine();
-                    long address = Long.parseLong(String.valueOf(arr, 0, 8), 16);
-                    byte[] bt = new byte[8];
-                    int start = 0;
-                    for (int s=0; s<8; s++)
-                    {
-                        String s1 = "";
-                        start = matrix.valid_xpos.next(start);
-                        s1 = s1+arr[start];
-                        start = matrix.valid_xpos.next(start);
-                        s1 = s1+arr[start];
-                        bt[s] = (byte)Integer.parseInt(s1, 16);
-                    }
-                    try
-                    {
-                        matrix.getMapper().putBytes(bt, address); //setBytes(address, bt);
-                    }
-                    catch (Exception e1)
-                    {
-                        e1.printStackTrace();
-                    }
-                }
-                else if (c != VK_BACKSPACE)
-                {
-                    matrix.putChar(CharacterWriter.getInstance().mapPCtoCBM(c),
-                        e.getKeyCode(), e.isActionKey());
-                }
-//                ringBuff.add(c);
-//                matrix.putChar(CharacterWriter.getInstance().mapPCtoCBM(c),
-//                        e.getKeyCode(), e.isActionKey());
+        addKeyListener(new KeyAdapter() {
+
+            boolean handleNormalKey(KeyEvent e) {
+                char c = CharacterWriter.getInstance().mapPCtoCBM(e.getKeyChar());
+                if (!matrix.isValidKey(c, e.getKeyCode(), e.isActionKey()))
+                    return false;
+                matrix.putChar(c);
+                return true;
             }
 
-            void handleSpecialKeys (KeyEvent e)
-            {
-                switch (e.getKeyCode())
-                {
-//                    case KeyEvent.VK_BACK_SPACE:
-//                        matrix.backspace();
-//                        break;
+            void handleEnter() {
+                char[] arr = matrix.readLine();
+                long address = Long.parseLong(String.valueOf(arr, 0, 8), 16);
+                byte[] bt = new byte[8];
+                int start = 0;
+                for (int s = 0; s < 8; s++) {
+                    String s1 = "";
+                    start = matrix.valid_xpos.next(start);
+                    s1 = s1 + arr[start];
+                    start = matrix.valid_xpos.next(start);
+                    s1 = s1 + arr[start];
+                    bt[s] = (byte) Integer.parseInt(s1, 16);
+                }
+                try {
+                    matrix.getMapper().putBytes(bt, address);
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
 
+            void handleCursorMove(KeyEvent e) {
+                switch (e.getKeyCode()) {
                     case KeyEvent.VK_LEFT:
                         matrix.left();
                         break;
@@ -115,10 +92,11 @@ public class C64Panel extends JPanel
             }
 
             @Override
-            public void keyPressed (KeyEvent e)
-            {
-                handleKey(e);
-                handleSpecialKeys(e);
+            public void keyPressed(KeyEvent e) {
+                if (handleNormalKey(e))
+                    handleEnter();
+                else
+                    handleCursorMove(e);
                 repaint();
             }
         });
@@ -132,14 +110,12 @@ public class C64Panel extends JPanel
     }
 
     @Override
-    protected void paintComponent (Graphics g)
-    {
+    protected void paintComponent(Graphics g) {
         matrix.render(g);
     }
 
     @Override
-    public void update (Graphics g)
-    {
+    public void update(Graphics g) {
         //super.update(g);
     }
 }

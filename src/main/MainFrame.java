@@ -48,7 +48,9 @@ public class MainFrame
         frame.setResizable(false);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
+        frame.setLocationRelativeTo(null);  // Center on display
         frame.setVisible(true);
+        mf.nestedForm1.fileOpen();
     }
 
     private void createUIComponents ()
